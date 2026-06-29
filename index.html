@@ -1,212 +1,181 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sistem Rekomendasi Jurusan — UNS</title>
-  <link rel="stylesheet" href="src/css/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PathFinder — Temukan Jalanmu</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ═══ NAVBAR ═══════════════════════════════════════════════ -->
-<nav class="navbar">
-  <a class="navbar-brand" href="#">
-    <img src="images/logo.png" alt="Logo UNS" class="navbar-logo" />
-    <div>
-      <span class="navbar-title">RekomendasiJurusan</span>
-      <span class="navbar-subtitle">Universitas Sebelas Maret</span>
+<div class="sb-ov" id="sbOv" onclick="closeSb()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <span class="sb-logo">PathFinder</span>
+    <button class="sb-close" onclick="closeSb()">X</button>
+  </div>
+  <div class="sb-body">
+    <div class="sb-section">
+      <div class="sb-sec-lbl">Menu</div>
+      <a href="index.html" class="sb-link">Beranda</a>
+      <a href="form.html" class="sb-link">Mulai Tes</a>
+      <a class="sb-link" onclick="showRiwayat()">Riwayat Tes</a>
     </div>
-  </a>
-  <div style="font-size:12px;color:var(--gray-400);">Fuzzy Logic · Mamdani</div>
-</nav>
+    <div class="sb-section">
+      <div class="sb-sec-lbl">Info</div>
+      <a class="sb-link" onclick="showAbout()">Tentang PathFinder</a>
+      <a class="sb-link" onclick="showTutorial()">Tutorial</a>
+      <a class="sb-link" onclick="showMetode()">Metode Fuzzy Mamdani</a>
+    </div>
+  </div>
+  <div class="sb-foot">PathFinder v2.0 · 2026</div>
+</aside>
 
-<!-- ═══ HERO ══════════════════════════════════════════════════ -->
-<section class="hero">
-  <div class="hero-images">
-    <img src="images/toga.png" alt="Toga wisuda" class="hero-img toga" />
-    <img src="images/jas.png"  alt="Jas almamater UNS" class="hero-img jas"  />
-  </div>
-  <div class="hero-badge">Sistem Pakar · Berbasis AI</div>
-  <h1>Temukan Jurusan Kuliah<br/>yang Paling Tepat Untukmu</h1>
-  <p>Menggunakan metode Fuzzy Logic Mamdani untuk menganalisis nilai akademik, minat, dan kemampuan TPA-mu.</p>
-  <div class="hero-steps">
-    <div class="hero-step"><div class="hero-step-num">1</div>Data diri</div>
-    <div class="hero-step"><div class="hero-step-num">2</div>Nilai akademik</div>
-    <div class="hero-step"><div class="hero-step-num">3</div>Kuesioner minat</div>
-    <div class="hero-step"><div class="hero-step-num">4</div>Tes TPA</div>
-    <div class="hero-step"><div class="hero-step-num">5</div>Hasil rekomendasi</div>
-  </div>
-</section>
+<div class="modal-ov" id="modalOv" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box"><div id="modalContent"></div></div>
+</div>
+<div class="modal-ov" id="modalBidangOv" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal-box" id="modalBidangBox"></div>
+</div>
 
-<!-- ═══ PROGRESS BAR ══════════════════════════════════════════ -->
-<div class="progress-section">
-  <div class="progress-header">
-    <span class="progress-label" id="progressLabel">Langkah 1 dari 5 — Data Diri</span>
-    <span class="progress-count" id="progressCount">20%</span>
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="ham" onclick="openSb()">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="index.html" class="tb-brand">PathFinder</a>
   </div>
-  <div class="progress-track">
-    <div class="progress-fill" id="progressFill" style="width:20%"></div>
+  <div class="tb-right">
+    <a href="form.html" class="tb-btn">Mulai Tes</a>
   </div>
-  <div class="step-dots" id="stepDots">
-    <div class="step-dot active"></div>
-    <div class="step-dot"></div>
-    <div class="step-dot"></div>
-    <div class="step-dot"></div>
-    <div class="step-dot"></div>
+</header>
+
+<div class="hero">
+  <div class="hero-blob1"></div>
+  <div class="hero-blob2"></div>
+  <div class="hero-inner">
+    <div class="hero-tag">Berbasis Fuzzy Mamdani</div>
+    <h1>Temukan <span>Jurusanmu</span>,<br>Raih Masa Depanmu</h1>
+    <p class="hero-sub">Analisis nilai, kemampuan, dan minatmu. Dapatkan 3 rekomendasi jurusan terbaik.</p>
+    <div class="hero-pills">
+      <span class="hero-pill">10 Pilihan Jurusan</span>
+      <span class="hero-pill">Timer Real-time</span>
+      <span class="hero-pill">Ekspor PDF</span>
+    </div>
+    <a href="form.html" class="hero-btn">Mulai Sekarang</a>
   </div>
 </div>
 
-<!-- ═══ MAIN ══════════════════════════════════════════════════ -->
-<main class="main">
+<main class="wrap">
+  <div class="sec-lbl">Pilih Bidang Minatmu</div>
 
-  <!-- ── STEP 0: Data Diri ─────────────────────────────────── -->
-  <div class="step-panel active" id="step-profil">
-    <div class="section-eyebrow">Langkah 1</div>
-    <div class="section-title">Data Diri</div>
-    <div class="section-desc">Masukkan nama dan pilih jurusan SMA-mu untuk memulai proses rekomendasi.</div>
-
-    <div class="card">
-      <div class="form-group">
-        <label class="form-label" for="inputNama">Nama Lengkap</label>
-        <input class="form-input" type="text" id="inputNama" placeholder="Masukkan namamu..." />
+  <div class="cat-row-top">
+    <div class="cat-item" onclick="showBidang('teknologi')">
+      <div class="cat-img-wrap">
+        <img src="images/Teknologi.png" alt="Teknologi" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
+        <div class="cat-emoji-box" style="background:#FFE8F0;display:none;">💻</div>
       </div>
-
-      <div class="form-group">
-        <label class="form-label">Jurusan SMA / MA</label>
-        <div class="radio-group">
-          <div class="radio-card" id="card-mipa" onclick="pilihJurusanSMA('MIPA')">
-            <div class="radio-card-icon">🔬</div>
-            <div>
-              <div class="radio-card-text">IPA / MIPA</div>
-              <div class="radio-card-sub">Mat · Fisika · Bio · Kimia</div>
-            </div>
-          </div>
-          <div class="radio-card" id="card-ips" onclick="pilihJurusanSMA('IPS')">
-            <div class="radio-card-icon">📈</div>
-            <div>
-              <div class="radio-card-text">IPS</div>
-              <div class="radio-card-sub">Mat · Ekonomi · Sosiologi</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div class="cat-name">Teknologi</div>
+      <div class="cat-sub">Informatika · Sistem Informasi</div>
     </div>
-
-    <div class="btn-row">
-      <span></span>
-      <button class="btn btn-primary" onclick="nextStep()">
-        Lanjut
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
-      </button>
+    <div class="cat-item" onclick="showBidang('kesehatan')">
+      <div class="cat-img-wrap">
+        <img src="images/Kesehatan.png" alt="Kesehatan" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
+        <div class="cat-emoji-box" style="background:#FEFDD0;display:none;">🏥</div>
+      </div>
+      <div class="cat-name">Kesehatan</div>
+      <div class="cat-sub">Kedokteran · Keperawatan · Gizi</div>
+    </div>
+    <div class="cat-item" onclick="showBidang('bisnis')">
+      <div class="cat-img-wrap">
+        <img src="images/Bisnis.png" alt="Bisnis" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
+        <div class="cat-emoji-box" style="background:#FFE8F0;display:none;">💼</div>
+      </div>
+      <div class="cat-name">Bisnis</div>
+      <div class="cat-sub">Akuntansi · Manajemen</div>
     </div>
   </div>
-
-  <!-- ── STEP 1: Nilai Akademik ─────────────────────────────── -->
-  <div class="step-panel" id="step-akademik">
-    <div class="section-eyebrow">Langkah 2</div>
-    <div class="section-title">Nilai Akademik</div>
-    <div class="section-desc">Masukkan nilai rapor rata-rata untuk setiap mata pelajaran (0–100).</div>
-
-    <div class="card">
-      <div class="mapel-grid" id="mapelGrid">
-        <!-- diisi oleh JS -->
+  <div class="cat-row-bot">
+    <div class="cat-item" onclick="showBidang('komunikasi')">
+      <div class="cat-img-wrap">
+        <img src="images/Komunikasi.png" alt="Komunikasi" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
+        <div class="cat-emoji-box" style="background:#FEFDD0;display:none;">📢</div>
       </div>
+      <div class="cat-name">Komunikasi</div>
+      <div class="cat-sub">Ilmu Komunikasi · Psikologi</div>
     </div>
-
-    <div class="btn-row">
-      <button class="btn btn-ghost" onclick="prevStep()">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 4L3 8l4 4"/></svg>
-        Kembali
-      </button>
-      <button class="btn btn-primary" onclick="nextStep()">
-        Lanjut
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- ── STEP 2: Kuesioner Minat ────────────────────────────── -->
-  <div class="step-panel" id="step-minat">
-    <div class="section-eyebrow">Langkah 3</div>
-    <div class="section-title">Kuesioner Minat</div>
-    <div class="section-desc">
-      Jawab setiap pernyataan sesuai perasaanmu.<br/>
-      <strong>1</strong> = Sangat Tidak Setuju &nbsp;·&nbsp; <strong>4</strong> = Sangat Setuju
-    </div>
-
-    <div class="card">
-      <div class="minat-tabs" id="minatTabs">
-        <!-- diisi JS -->
+    <div class="cat-item" onclick="showBidang('sosial')">
+      <div class="cat-img-wrap">
+        <img src="images/Sosial.png" alt="Sosial" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
+        <div class="cat-emoji-box" style="background:#FFE8F0;display:none;">🤝</div>
       </div>
-      <div class="pernyataan-list" id="pernyataanList">
-        <!-- diisi JS -->
-      </div>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn btn-ghost" onclick="prevStep()">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 4L3 8l4 4"/></svg>
-        Kembali
-      </button>
-      <button class="btn btn-primary" onclick="nextStep()">
-        Lanjut
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
-      </button>
+      <div class="cat-name">Sosial</div>
+      <div class="cat-sub">Psikologi · Administrasi Publik</div>
     </div>
   </div>
-
-  <!-- ── STEP 3: TPA ─────────────────────────────────────────── -->
-  <div class="step-panel" id="step-tpa">
-    <div class="section-eyebrow">Langkah 4</div>
-    <div class="section-title">Tes Potensi Akademik (TPA)</div>
-    <div class="section-desc">Kerjakan soal-soal berikut. Jawaban benar/salah langsung ditampilkan setelah memilih.</div>
-
-    <div class="card" id="tpaCard">
-      <!-- diisi JS -->
-    </div>
-
-    <div class="btn-row">
-      <button class="btn btn-ghost" id="btnTpaPrev" onclick="tpaPrev()">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 4L3 8l4 4"/></svg>
-        Kembali
-      </button>
-      <button class="btn btn-primary" id="btnTpaNext" onclick="tpaNext()">
-        Lanjut
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- ── STEP 4: Hasil ───────────────────────────────────────── -->
-  <div class="step-panel" id="step-hasil">
-    <div id="hasilContent">
-      <!-- diisi JS -->
-    </div>
-
-    <div class="print-btn-row">
-      <button class="btn btn-gold" onclick="window.print()">
-        🖨️ Cetak Hasil
-      </button>
-      <button class="btn btn-ghost" onclick="mulaiUlang()">
-        🔄 Mulai Ulang
-      </button>
-    </div>
-  </div>
-
 </main>
 
-<!-- ═══ FOOTER ════════════════════════════════════════════════ -->
 <footer class="footer">
-  <img src="images/logo.png" alt="UNS" class="footer-logo" />
-  <p>Sistem Rekomendasi Jurusan · Universitas Sebelas Maret · Metode Fuzzy Logic Mamdani</p>
-  <p style="margin-top:4px">Dikembangkan sebagai tugas praktikum pemrograman web</p>
+  <div class="footer-inner">
+    <div class="footer-brand">PathFinder</div>
+    <div class="footer-links">
+      <a onclick="showAbout()">Tentang</a>
+      <a onclick="showTutorial()">Tutorial</a>
+      <a href="form.html">Mulai Tes</a>
+    </div>
+    <div class="footer-copy">© 2026 PathFinder · Fuzzy Mamdani</div>
+  </div>
 </footer>
 
-<!-- ═══ SCRIPTS ═══════════════════════════════════════════════ -->
-<script src="src/js/utils.js"></script>
-<script src="src/js/data.js"></script>
-<script src="src/js/fuzzy.js"></script>
-<script src="src/js/app.js"></script>
+<script>
+function openSb(){document.getElementById('sidebar').classList.add('open');document.getElementById('sbOv').classList.add('show');}
+function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOv').classList.remove('show');}
+function closeModal(){document.getElementById('modalOv').classList.remove('show');}
 
+function showInfo(title,sub,body){
+  document.getElementById('modalContent').innerHTML=`<button class="modal-close" onclick="closeModal()">X</button><div class="m-title">${title}</div><div class="m-sub">${sub}</div><div class="m-body">${body}</div>`;
+  document.getElementById('modalOv').classList.add('show');
+  closeSb();
+}
+
+function showAbout(){showInfo('PathFinder','Tentang Sistem','PathFinder adalah sistem rekomendasi jurusan kuliah berbasis <strong>Fuzzy Mamdani</strong>. Sistem ini menganalisis tiga faktor: nilai akademik (dibedakan MIPA/IPS), kemampuan kognitif melalui tes TPA, dan minat siswa di 5 bidang. Hasilnya berupa 3 rekomendasi jurusan dengan persentase kecocokan, prospek karier, dan alasan rekomendasi yang bisa diekspor sebagai PDF.');}
+function showTutorial(){showInfo('Tutorial','Cara Menggunakan','<b>1. Data Diri</b> — Nama & jurusan SMA<br><b>2. Nilai Akademik</b> — Nilai rapor 0–100<br><b>3. Kuisioner Minat</b> — 25 pernyataan, semua wajib dijawab<br><b>4. TPA Logika</b> — 10 soal, 10 menit<br><b>5. TPA Numerik</b> — 10 soal, 10 menit<br><b>6. TPA Verbal</b> — 10 soal, 10 menit<br><b>7. Hasil</b> — Lihat rekomendasi & simpan PDF');}
+function showMetode(){showInfo('Fuzzy Mamdani','Metode Inferensi','Fuzzy Mamdani mengubah nilai input ke derajat keanggotaan <b>Rendah/Sedang/Tinggi</b>, lalu menerapkan aturan IF-THEN untuk menghasilkan skor kecocokan 0–4. Skor ini dikonversi ke persentase dan diurutkan untuk mendapatkan top 3 rekomendasi.');}
+
+function showRiwayat(){
+  const h=JSON.parse(localStorage.getItem('pf_history')||'[]');
+  const body=h.length?h.map(x=>`<div style="padding:8px 0;border-bottom:1px solid #F0E0EA;font-size:13px;"><strong>${x.nama}</strong> · ${x.tanggal}<br><span style="color:#C2456A;font-weight:700;">${x.top1}</span> (${x.pct}%)</div>`).join('')+'<a href="hasil.html" style="display:block;text-align:center;margin-top:14px;padding:10px;background:#C2456A;color:#fff;border-radius:12px;text-decoration:none;font-weight:700;">Lihat Hasil Terakhir</a>':'<p style="text-align:center;color:#9A8AA0;padding:20px 0;">Belum ada riwayat tes.</p>';
+  document.getElementById('modalContent').innerHTML=`<button class="modal-close" onclick="closeModal()">X</button><div class="m-title">Riwayat Tes</div><div class="m-sub">Hasil Sebelumnya</div><div class="m-body">${body}</div>`;
+  document.getElementById('modalOv').classList.add('show');
+  closeSb();
+}
+
+const BD={
+  teknologi:{icon:'💻',name:'Teknologi',prodi:['Informatika','Sistem Informasi','Teknik Komputer'],belajar:['Pemrograman & Algoritma','Basis Data','Kecerdasan Buatan','Rekayasa Perangkat Lunak','Jaringan Komputer'],cocok:['Suka logika & problem solving','Tertarik teknologi & gadget','Suka matematika & analisis','Kreatif membangun solusi digital']},
+  kesehatan:{icon:'🏥',name:'Kesehatan',prodi:['Kedokteran','Keperawatan','Gizi Klinik'],belajar:['Anatomi & Fisiologi','Farmakologi','Ilmu Penyakit','Keperawatan Klinik','Gizi & Dietika'],cocok:['Punya empati tinggi','Suka biologi & kimia','Ingin membantu orang','Tenang menghadapi tekanan']},
+  bisnis:{icon:'💼',name:'Bisnis',prodi:['Akuntansi','Manajemen','Bisnis Digital'],belajar:['Akuntansi Keuangan','Manajemen Strategi','Pemasaran','Kewirausahaan','Ekonomi'],cocok:['Suka analisis angka','Tertarik dunia bisnis','Pandai bernegosiasi','Berorientasi hasil']},
+  komunikasi:{icon:'📢',name:'Komunikasi',prodi:['Ilmu Komunikasi','Psikologi','Hubungan Internasional'],belajar:['Teori Komunikasi','Jurnalistik','Public Relations','Psikologi Sosial','Media Digital'],cocok:['Mudah bergaul','Suka menulis & presentasi','Tertarik media & konten','Peka dinamika sosial']},
+  sosial:{icon:'🤝',name:'Sosial',prodi:['Administrasi Publik','Psikologi','Sosiologi'],belajar:['Kebijakan Publik','Perilaku Organisasi','Psikologi Perkembangan','Metode Penelitian Sosial'],cocok:['Peduli isu sosial','Suka kerja tim','Ingin berkontribusi ke masyarakat','Tertarik pemerintahan & pelayanan']},
+};
+
+function showBidang(k){
+  const b=BD[k];
+  document.getElementById('modalBidangBox').innerHTML=`
+    <button class="modal-close" onclick="document.getElementById('modalBidangOv').classList.remove('show')">X</button>
+    <div style="font-size:36px;margin:4px 0 10px;">${b.icon}</div>
+    <div class="m-title">${b.name}</div>
+    <div class="m-sub">Bidang Studi</div>
+    <div class="m-body">
+      <p style="font-size:12px;font-weight:700;color:#9A8AA0;margin-bottom:6px;">Program Studi</p>
+      <div class="m-tags">${b.prodi.map(p=>`<span class="m-tag m-tag-p">${p}</span>`).join('')}</div>
+      <p style="font-size:12px;font-weight:700;color:#9A8AA0;margin:12px 0 6px;">Yang akan kamu pelajari</p>
+      <div class="m-tags">${b.belajar.map(x=>`<span class="m-tag m-tag-b">${x}</span>`).join('')}</div>
+      <p style="font-size:12px;font-weight:700;color:#9A8AA0;margin:12px 0 6px;">Cocok buat kamu yang...</p>
+      <div class="m-tags">${b.cocok.map(x=>`<span class="m-tag m-tag-g">${x}</span>`).join('')}</div>
+    </div>
+    <button class="m-cta" onclick="window.location.href='form.html'">Ikuti Tes Sekarang</button>`;
+  document.getElementById('modalBidangOv').classList.add('show');
+}
+</script>
 </body>
 </html>

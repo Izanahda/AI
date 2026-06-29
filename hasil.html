@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Hasilmu — PathFinder</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* Hasil estetik extras */
+.konfeti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;overflow:hidden;}
+.k{position:absolute;width:8px;height:8px;border-radius:2px;animation:fall linear forwards;}
+@keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* PDF hidden */
+#pdfDoc{position:fixed;left:-9999px;top:0;width:700px;background:#fff;padding:36px;}
+</style>
+</head>
+<body>
+
+<div class="konfeti" id="konfeti"></div>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="index.html" class="tb-brand">PathFinder</a>
+  </div>
+  <div class="tb-right">
+    <button class="tb-ghost" onclick="savePDF()">Simpan PDF</button>
+    <a href="index.html" class="tb-btn" style="font-size:12.5px;padding:6px 14px;">Beranda</a>
+  </div>
+</header>
+
+<div class="hasil-wrap" id="mainContent">
+
+<div class="hasil-hero">
+  <div class="hh-deco"><div class="hh-blob1"></div><div class="hh-blob2"></div></div>
+  <div class="hh-inner">
+    <div style="font-size:48px;margin-bottom:8px;">🎉</div>
+    <div class="hh-title">Hasil Rekomendasimu</div>
+    <div class="hh-sub">Analisis berbasis Fuzzy Mamdani dari nilai, TPA, dan minatmu</div>
+    <div class="hh-chip" id="namaChip">—</div>
+  </div>
+</div>
+
+<div class="sec-lbl" style="margin-top:0;">Top 3 Rekomendasi</div>
+<div class="top3" id="top3"></div>
+
+<div class="sec-lbl">Prospek Karier Rekomendasi Utama</div>
+<div class="rdetail">
+  <div class="rdetail-title">Pilihan Karier — <span id="prospekJurusan" style="color:#C2456A;"></span></div>
+  <div class="pgrid" id="prospekGrid"></div>
+</div>
+
+<div class="rdetail">
+  <div class="rdetail-title">Mengapa Jurusan Ini?</div>
+  <div id="alasanList"></div>
+</div>
+
+<div class="rdetail">
+  <div class="rdetail-title">Detail Skor Input</div>
+  <div id="scoreBars"></div>
+</div>
+
+<div class="sec-lbl">Semua Jurusan</div>
+<div class="all-tbl">
+  <table>
+    <thead><tr><th>#</th><th>Jurusan</th><th>Kecocokan</th><th>Status</th><th>Akademik</th><th>TPA</th><th>Minat</th></tr></thead>
+    <tbody id="allTbl"></tbody>
+  </table>
+</div>
+
+<div class="action-row">
+  <a href="form.html" class="btn btn-p">Tes Ulang</a>
+  <button class="btn btn-g" onclick="savePDF()">Simpan PDF</button>
+</div>
+
+</div><!-- /hasil-wrap -->
+
+<!-- PDF dokumen (off-screen) -->
+<div id="pdfDoc">
+  <div style="text-align:center;padding-bottom:20px;border-bottom:3px solid #FFDCE8;margin-bottom:24px;">
+    <div style="font-size:26px;font-weight:900;color:#C2456A;font-family:Arial;">PathFinder</div>
+    <div style="font-size:12px;color:#9A8AA0;margin-top:4px;">Laporan Rekomendasi Jurusan Kuliah</div>
+  </div>
+  <div id="pdf-info" style="margin-bottom:20px;"></div>
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9A8AA0;margin-bottom:10px;">Top 3 Rekomendasi</div>
+  <div id="pdf-top3" style="margin-bottom:20px;"></div>
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9A8AA0;margin-bottom:10px;">Prospek Karier — Rekomendasi Utama</div>
+  <div id="pdf-prospek" style="margin-bottom:20px;"></div>
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9A8AA0;margin-bottom:10px;">Alasan Rekomendasi</div>
+  <div id="pdf-alasan" style="margin-bottom:20px;"></div>
+  <div style="font-size:10px;color:#9A8AA0;text-align:center;margin-top:32px;padding-top:16px;border-top:1px solid #F0E0EA;">
+    Dihasilkan oleh PathFinder · Sistem Rekomendasi Jurusan berbasis Fuzzy Mamdani · 2026
+  </div>
+</div>
+
+<script src="fuzzy.js"></script>
+<script>
+const nama=localStorage.getItem('pf_nama')||'—';
+const hasil=JSON.parse(localStorage.getItem('pf_hasil')||'[]');
+
+// Konfeti
+function launchKonfeti(){
+  const colors=['#FFDCE8','#FFB3CD','#FEFDD0','#FFF9A0','#FF85AD','#FFE0EC'];
+  const c=document.getElementById('konfeti');
+  for(let i=0;i<60;i++){
+    const k=document.createElement('div');
+    k.className='k';
+    k.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*.8}s;`;
+    c.appendChild(k);
+  }
+  setTimeout(()=>c.innerHTML='',4000);
+}
+
+if(!hasil.length){
+  document.getElementById('mainContent').innerHTML='<div style="text-align:center;padding:80px 20px;"><div style="font-size:56px;margin-bottom:16px;">🤔</div><h2 style="font-family:Poppins,sans-serif;font-size:1.6rem;">Belum ada hasil</h2><p style="color:#9A8AA0;margin:8px 0 24px;font-weight:500;">Silakan kerjakan tes terlebih dahulu.</p><a href="form.html" style="background:#C2456A;color:#fff;padding:12px 28px;border-radius:14px;text-decoration:none;font-weight:800;font-family:Poppins,sans-serif;">Mulai Tes</a></div>';
+} else {
+  launchKonfeti();
+  render();
+}
+
+function render(){
+  document.getElementById('namaChip').textContent='Halo, '+nama;
+
+  const medals=['🥇','🥈','🥉'];
+  const top3=hasil.slice(0,3);
+
+  document.getElementById('top3').innerHTML=top3.map((h,i)=>{
+    const lb=labelSkor(h.skor);
+    return `<div class="rcard r${i+1}">
+      <div class="medal">${medals[i]}</div>
+      <div class="rname">${h.jurusan}</div>
+      <div class="rpct">${h.pct}%</div>
+      <div class="rpct-lbl">Tingkat Kecocokan</div>
+      <span class="rlbl ${lb.c}">${lb.t}</span>
+    </div>`;
+  }).join('');
+
+  const best=hasil[0];
+  document.getElementById('prospekJurusan').textContent=best.jurusan;
+  document.getElementById('prospekGrid').innerHTML=(best.p||[]).map(p=>`<div class="ptag">${p}</div>`).join('');
+  document.getElementById('alasanList').innerHTML=(best.a||[]).map(a=>`<div class="aitem"><div class="acheck">v</div>${a}</div>`).join('');
+  document.getElementById('scoreBars').innerHTML=[
+    {l:'Nilai Akademik',v:best.akVal},
+    {l:'Kemampuan TPA',v:best.tpaVal},
+    {l:'Minat',v:best.minatVal},
+  ].map(s=>`<div class="sbar"><div class="sbar-lbl"><span>${s.l}</span><span>${s.v.toFixed(1)}</span></div><div class="sbar-track"><div class="sbar-fill" style="width:${s.v}%"></div></div></div>`).join('');
+
+  document.getElementById('allTbl').innerHTML=hasil.map((h,i)=>{
+    const lb=labelSkor(h.skor);
+    return `<tr><td>${i+1}</td><td><strong>${h.jurusan}</strong></td>
+      <td style="font-family:monospace;font-size:11px;color:#C2456A;">${'█'.repeat(Math.round(h.pct/10)).padEnd(10,'░')} ${h.pct}%</td>
+      <td><span class="rlbl ${lb.c}">${lb.t}</span></td>
+      <td>${h.akVal.toFixed(0)}</td><td>${h.tpaVal.toFixed(0)}</td><td>${h.minatVal.toFixed(0)}</td></tr>`;
+  }).join('');
+
+  // Build PDF
+  const best2=hasil[0];
+  document.getElementById('pdf-info').innerHTML=`<div style="font-size:16px;font-weight:800;margin-bottom:2px;">${nama}</div><div style="font-size:12px;color:#9A8AA0;">${new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>`;
+  document.getElementById('pdf-top3').innerHTML=top3.map((h,i)=>{
+    const lb=labelSkor(h.skor);
+    return `<div style="display:flex;align-items:center;padding:10px 14px;border:2px solid ${i===0?'#FFB3CD':'#F0E0EA'};border-radius:12px;margin-bottom:8px;background:${i===0?'#FFF0F5':'#FEFBFD'};">
+      <span style="font-size:20px;margin-right:12px;">${medals[i]}</span>
+      <div style="flex:1;"><div style="font-weight:800;font-size:14px;">${h.jurusan}</div><div style="font-size:11px;color:#9A8AA0;">${lb.t}</div></div>
+      <div style="font-size:22px;font-weight:900;color:#C2456A;">${h.pct}%</div>
+    </div>`;
+  }).join('');
+  document.getElementById('pdf-prospek').innerHTML=`<div style="font-size:13px;color:#5A4A60;line-height:1.7;">${(best2.p||[]).join(' · ')}</div>`;
+  document.getElementById('pdf-alasan').innerHTML=(best2.a||[]).map(a=>`<div style="padding:6px 0;border-bottom:1px solid #F0E0EA;font-size:13px;color:#5A4A60;">• ${a}</div>`).join('');
+}
+
+function savePDF(){
+  const el=document.getElementById('pdfDoc');
+  // Simple print-based PDF
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>PathFinder — ${nama}</title>
+  <style>body{font-family:Arial,sans-serif;margin:0;padding:36px;color:#2A1F2E;}*{box-sizing:border-box;}</style>
+  </head><body>${el.innerHTML}</body></html>`);
+  w.document.close();
+  setTimeout(()=>{w.print();},500);
+}
+</script>
+</body>
+</html>
