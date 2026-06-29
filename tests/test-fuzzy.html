@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unit Test — Fuzzy Logic</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f7f8fa;
+      color: #1a2230;
+      font-size: 14px;
+      padding: 2rem;
+    }
+    h1 { font-size: 1.3rem; margin-bottom: .25rem; color: #005F8E; }
+    .sub { font-size: 13px; color: #777; margin-bottom: 2rem; }
+
+    /* Sections */
+    .section { margin-bottom: 2.5rem; }
+    .section h2 {
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: #555; border-bottom: 1px solid #e2e5ea;
+      padding-bottom: 6px; margin-bottom: 1rem;
+    }
+
+    /* Input manual */
+    .input-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem; align-items: flex-end; }
+    label { font-size: 12px; font-weight: 600; color: #555; display: block; margin-bottom: 4px; }
+    input[type=number], input[type=text] {
+      padding: 7px 11px; border: 1.5px solid #dde1e7; border-radius: 7px;
+      font-size: 14px; width: 120px; outline: none;
+    }
+    input:focus { border-color: #0085C8; box-shadow: 0 0 0 2px rgba(0,133,200,.1); }
+    button {
+      padding: 8px 18px; background: #0085C8; color: #fff;
+      border: none; border-radius: 7px; font-size: 13px; font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { background: #005F8E; }
+    button.secondary {
+      background: #fff; color: #555; border: 1.5px solid #dde1e7;
+    }
+    button.secondary:hover { background: #f0f0f0; }
+
+    /* Result box */
+    .result-box {
+      background: #fff; border: 1px solid #dde1e7; border-radius: 10px;
+      padding: 1rem 1.25rem; margin-top: .5rem;
+      font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8;
+    }
+
+    /* Test suite */
+    .test-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .test-table th {
+      text-align: left; padding: 8px 12px; background: #f0f2f5;
+      font-weight: 600; font-size: 11px; text-transform: uppercase;
+      letter-spacing: .05em; color: #555;
+    }
+    .test-table td { padding: 8px 12px; border-bottom: 1px solid #eef0f3; }
+    .test-table tr:last-child td { border: none; }
+
+    .badge {
+      display: inline-block; padding: 2px 10px; border-radius: 99px;
+      font-size: 11px; font-weight: 700;
+    }
+    .pass { background: #dcfce7; color: #15803d; }
+    .fail { background: #fee2e2; color: #dc2626; }
+    .skip { background: #fef3c7; color: #d97706; }
+
+    /* Summary */
+    .summary {
+      display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 1rem;
+    }
+    .sum-box {
+      background: #fff; border: 1px solid #dde1e7; border-radius: 8px;
+      padding: 10px 16px; text-align: center; min-width: 80px;
+    }
+    .sum-box .num { font-size: 22px; font-weight: 700; }
+    .sum-box .lbl { font-size: 11px; color: #777; }
+    .sum-box.green .num { color: #16a34a; }
+    .sum-box.red   .num { color: #dc2626; }
+    .sum-box.blue  .num { color: #0085C8; }
+
+    /* Membership chart */
+    canvas { border: 1px solid #dde1e7; border-radius: 8px; background: #fff; }
+  </style>
+</head>
+<body>
+
+<h1>🧪 Unit Test — Fuzzy Logic Mamdani</h1>
+<p class="sub">Pengujian fungsi <code>fuzzify()</code>, <code>hitungSkorJurusan()</code>, dan <code>hitungSemuaJurusan()</code> secara manual.</p>
+
+<!-- ══ SECTION 1: Fuzzifikasi Manual ══════════════════════ -->
+<div class="section">
+  <h2>1. Uji Fuzzifikasi Manual</h2>
+  <p style="font-size:13px;color:#666;margin-bottom:12px">Masukkan nilai (0–100) dan lihat derajat keanggotaan rendah/sedang/tinggi.</p>
+  <div class="input-row">
+    <div>
+      <label for="inpNilai">Nilai</label>
+      <input type="number" id="inpNilai" min="0" max="100" value="75" />
+    </div>
+    <button onclick="testFuzzify()">Hitung</button>
+  </div>
+  <div class="result-box" id="resultFuzzify">— klik Hitung —</div>
+
+  <!-- Grafik fungsi keanggotaan -->
+  <div style="margin-top:1rem">
+    <label style="margin-bottom:8px;display:block">Grafik Fungsi Keanggotaan</label>
+    <canvas id="chartMF" width="600" height="200"></canvas>
+  </div>
+</div>
+
+<!-- ══ SECTION 2: Uji Skor Jurusan Manual ══════════════════ -->
+<div class="section">
+  <h2>2. Uji Skor Jurusan Manual</h2>
+  <p style="font-size:13px;color:#666;margin-bottom:12px">Masukkan tiga nilai input dan lihat skor fuzzy yang dihasilkan.</p>
+  <div class="input-row">
+    <div><label>Akademik (0–100)</label><input type="number" id="inpAk"  min="0" max="100" value="80" /></div>
+    <div><label>TPA (0–100)</label>     <input type="number" id="inpTpa" min="0" max="100" value="80" /></div>
+    <div><label>Minat (0–100)</label>   <input type="number" id="inpMi"  min="0" max="100" value="85" /></div>
+    <button onclick="testSkor()">Hitung Skor</button>
+  </div>
+  <div class="result-box" id="resultSkor">— klik Hitung Skor —</div>
+</div>
+
+<!-- ══ SECTION 3: Test Suite Otomatis ══════════════════════ -->
+<div class="section">
+  <h2>3. Test Suite Otomatis</h2>
+  <p style="font-size:13px;color:#666;margin-bottom:12px">Kasus uji dari <code>tests/test-cases.json</code> dijalankan otomatis.</p>
+
+  <div class="summary" id="testSummary"></div>
+  <button onclick="runAllTests()" style="margin-bottom:1rem">▶ Jalankan Semua Test</button>
+  <button class="secondary" onclick="loadTestCases()">🔄 Reload Test Cases</button>
+
+  <div style="overflow-x:auto;margin-top:1rem">
+    <table class="test-table" id="testTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nama Kasus</th>
+          <th>Input (Ak / TPA / Minat)</th>
+          <th>Ekspektasi</th>
+          <th>Output Aktual</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="testBody">
+        <tr><td colspan="6" style="color:#999;text-align:center;padding:1.5rem">Klik "Jalankan Semua Test"</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ SECTION 4: Simulasi Lengkap ════════════════════════ -->
+<div class="section">
+  <h2>4. Simulasi Lengkap — Semua Jurusan</h2>
+  <p style="font-size:13px;color:#666;margin-bottom:12px">Masukkan data lengkap dan lihat ranking semua jurusan.</p>
+  <div class="input-row">
+    <div>
+      <label>Jurusan SMA</label>
+      <select id="simSMA" style="padding:7px 11px;border:1.5px solid #dde1e7;border-radius:7px;font-size:14px">
+        <option value="MIPA">MIPA</option>
+        <option value="IPS">IPS</option>
+      </select>
+    </div>
+    <div><label>Matematika</label><input type="number" id="simMat" value="85" min="0" max="100"/></div>
+    <div><label>Fisika</label>    <input type="number" id="simFis" value="78" min="0" max="100"/></div>
+    <div><label>Biologi</label>   <input type="number" id="simBio" value="70" min="0" max="100"/></div>
+    <div><label>Kimia</label>     <input type="number" id="simKim" value="72" min="0" max="100"/></div>
+    <div><label>B.Inggris</label> <input type="number" id="simEng" value="80" min="0" max="100"/></div>
+  </div>
+  <div class="input-row">
+    <div><label>TPA Logika (%)</label>  <input type="number" id="simLog" value="80" min="0" max="100"/></div>
+    <div><label>TPA Numerik (%)</label> <input type="number" id="simNum" value="60" min="0" max="100"/></div>
+    <div><label>TPA Verbal (%)</label>  <input type="number" id="simVer" value="80" min="0" max="100"/></div>
+    <div><label>Minat Teknologi</label> <input type="number" id="simMTek" value="90" min="0" max="100"/></div>
+    <div><label>Minat Kesehatan</label> <input type="number" id="simMKes" value="50" min="0" max="100"/></div>
+    <div><label>Minat Bisnis</label>    <input type="number" id="simMBis" value="55" min="0" max="100"/></div>
+    <div><label>Minat Komunikasi</label><input type="number" id="simMKom" value="60" min="0" max="100"/></div>
+    <div><label>Minat Sosial</label>    <input type="number" id="simMSos" value="65" min="0" max="100"/></div>
+    <button onclick="runSimulasi()">Simulasi</button>
+  </div>
+  <div class="result-box" id="resultSim">— klik Simulasi —</div>
+</div>
+
+<!-- Scripts -->
+<script src="../src/js/data.js"></script>
+<script src="../src/js/fuzzy.js"></script>
+<script src="../src/js/utils.js"></script>
+
+<script>
+// ── 1. Fuzzifikasi Manual ───────────────────────────────
+function testFuzzify() {
+  const nilai = parseFloat(document.getElementById("inpNilai").value);
+  if (isNaN(nilai) || nilai < 0 || nilai > 100) {
+    document.getElementById("resultFuzzify").textContent = "⚠ Masukkan angka 0–100";
+    return;
+  }
+  const f   = fuzzify(nilai);
+  const dom = Object.entries(f).sort((a,b) => b[1]-a[1])[0];
+  document.getElementById("resultFuzzify").innerHTML = `
+Nilai input    : <strong>${nilai}</strong>
+
+Derajat keanggotaan:
+  rendah  = ${f.rendah.toFixed(4)}
+  sedang  = ${f.sedang.toFixed(4)}
+  tinggi  = ${f.tinggi.toFixed(4)}
+
+Kategori dominan: <strong>${dom[0].toUpperCase()}</strong> (${(dom[1]*100).toFixed(1)}%)
+  `;
+  drawMFChart(nilai);
+}
+
+// ── Grafik fungsi keanggotaan ───────────────────────────
+function drawMFChart(highlightVal) {
+  const canvas = document.getElementById("chartMF");
+  const ctx    = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const pad = { top: 20, right: 20, bottom: 30, left: 40 };
+  const plotW = W - pad.left - pad.right;
+  const plotH = H - pad.top  - pad.bottom;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = "#eee"; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (plotH / 4) * i;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+  }
+
+  // Axis labels
+  ctx.fillStyle = "#999"; ctx.font = "11px sans-serif"; ctx.textAlign = "center";
+  [0,25,50,75,100].forEach(v => {
+    const x = pad.left + (v / 100) * plotW;
+    ctx.fillText(v, x, H - 8);
+  });
+  ctx.textAlign = "right";
+  ["1.0","0.75","0.5","0.25","0.0"].forEach((v, i) => {
+    const y = pad.top + (plotH / 4) * i + 4;
+    ctx.fillText(v, pad.left - 6, y);
+  });
+
+  // Draw MF lines
+  const colors = { rendah: "#DC2626", sedang: "#D97706", tinggi: "#0085C8" };
+  const labels = { rendah: "Rendah", sedang: "Sedang", tinggi: "Tinggi" };
+
+  Object.entries(colors).forEach(([key, color]) => {
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+    let first = true;
+    for (let n = 0; n <= 100; n++) {
+      const f   = fuzzify(n);
+      const x   = pad.left + (n / 100) * plotW;
+      const y   = pad.top  + (1 - f[key]) * plotH;
+      if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Legend
+    const li = Object.keys(colors).indexOf(key);
+    ctx.fillStyle = color;
+    ctx.fillRect(pad.left + li * 90, 4, 20, 4);
+    ctx.fillStyle = "#333"; ctx.textAlign = "left"; ctx.font = "11px sans-serif";
+    ctx.fillText(labels[key], pad.left + li * 90 + 24, 10);
+  });
+
+  // Highlight vertical line
+  if (highlightVal !== undefined) {
+    const xH = pad.left + (highlightVal / 100) * plotW;
+    ctx.strokeStyle = "#22c55e"; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(xH, pad.top); ctx.lineTo(xH, H - pad.bottom); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = "#22c55e"; ctx.textAlign = "center"; ctx.font = "bold 11px sans-serif";
+    ctx.fillText(highlightVal, xH, pad.top - 6);
+  }
+}
+
+// ── 2. Skor Jurusan Manual ──────────────────────────────
+function testSkor() {
+  const ak  = parseFloat(document.getElementById("inpAk").value)  || 0;
+  const tpa = parseFloat(document.getElementById("inpTpa").value) || 0;
+  const mi  = parseFloat(document.getElementById("inpMi").value)  || 0;
+  const { skor, persentase, kategori } = hitungSkorJurusan(ak, tpa, mi);
+  const lbl = labelSkor(skor);
+  document.getElementById("resultSkor").innerHTML = `
+Input:
+  Akademik = ${ak}  →  kategori: ${kategoriDominan(ak)}
+  TPA      = ${tpa}  →  kategori: ${kategoriDominan(tpa)}
+  Minat    = ${mi}  →  kategori: ${kategoriDominan(mi)}
+
+Rule key  : (${kategori.ak}, ${kategori.tpa}, ${kategori.minat})
+
+Output:
+  Skor       = ${skor.toFixed(2)} / 4.00
+  Persentase = ${persentase}%
+  Label      = ${lbl.text}
+  `;
+}
+
+// ── 3. Test Suite ───────────────────────────────────────
+let testCases = [];
+
+async function loadTestCases() {
+  try {
+    const res  = await fetch("test-cases.json");
+    testCases  = await res.json();
+    showToastLocal(`${testCases.length} test case dimuat.`, "sukses");
+  } catch(e) {
+    showToastLocal("Gagal load test-cases.json: " + e.message, "error");
+  }
+}
+
+function runAllTests() {
+  if (!testCases.length) { alert("Load test cases terlebih dahulu."); return; }
+
+  let pass = 0, fail = 0;
+  const tbody = document.getElementById("testBody");
+  tbody.innerHTML = "";
+
+  testCases.forEach((tc, i) => {
+    const { skor, persentase } = hitungSkorJurusan(tc.akademik, tc.tpa, tc.minat);
+    const selisih = Math.abs(skor - tc.ekspektasi_skor);
+    const status  = selisih <= (tc.toleransi || 0.5) ? "pass" : "fail";
+    if (status === "pass") pass++; else fail++;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>${tc.nama}</td>
+      <td>Ak:${tc.akademik} / TPA:${tc.tpa} / Mi:${tc.minat}</td>
+      <td>≈${tc.ekspektasi_skor} (±${tc.toleransi||0.5})</td>
+      <td>${skor.toFixed(2)} (${persentase}%)</td>
+      <td><span class="badge ${status}">${status === "pass" ? "✅ PASS" : "❌ FAIL"}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("testSummary").innerHTML = `
+    <div class="sum-box blue"><div class="num">${testCases.length}</div><div class="lbl">Total</div></div>
+    <div class="sum-box green"><div class="num">${pass}</div><div class="lbl">Pass</div></div>
+    <div class="sum-box red"><div class="num">${fail}</div><div class="lbl">Fail</div></div>
+    <div class="sum-box"><div class="num">${Math.round(pass/testCases.length*100)}%</div><div class="lbl">Pass Rate</div></div>
+  `;
+}
+
+// ── 4. Simulasi Lengkap ─────────────────────────────────
+function runSimulasi() {
+  const sma = document.getElementById("simSMA").value;
+  const nilaiMapel = sma === "MIPA"
+    ? { Matematika: +simMat.value, Fisika: +simFis.value, Biologi: +simBio.value, Kimia: +simKim.value, "Bahasa Inggris": +simEng.value }
+    : { Matematika: +simMat.value, Ekonomi: 70, Sosiologi: 70, "Bahasa Inggris": +simEng.value };
+
+  const tpaVals   = { logika: +simLog.value, numerik: +simNum.value, verbal: +simVer.value };
+  const minatVals = {
+    Teknologi:  +simMTek.value, Kesehatan: +simMKes.value,
+    Bisnis:     +simMBis.value, Komunikasi: +simMKom.value, Sosial: +simMSos.value,
+  };
+
+  const hasil = hitungSemuaJurusan(nilaiMapel, sma, tpaVals, minatVals);
+  const baris = hasil.map((d, i) =>
+    `${String(i+1).padStart(2)}. ${d.jurusan.padEnd(22)} Skor: ${d.skor.toFixed(2)}  (${d.persentase}%)`
+  ).join("\n");
+
+  document.getElementById("resultSim").innerHTML =
+    `<strong>Ranking Jurusan (${sma}):</strong>\n\n${baris}\n\n<strong>Rekomendasi Utama: ${hasil[0].jurusan}</strong>`;
+}
+
+// ── Helper toast lokal ──────────────────────────────────
+function showToastLocal(msg, tipe) {
+  const el = document.createElement("div");
+  el.style.cssText = `position:fixed;bottom:20px;right:20px;background:${tipe==='sukses'?'#16a34a':'#dc2626'};color:#fff;padding:9px 16px;border-radius:8px;font-size:13px;z-index:999`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+// ── Init ────────────────────────────────────────────────
+loadTestCases();
+drawMFChart();
+</script>
+
+</body>
+</html>

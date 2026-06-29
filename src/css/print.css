@@ -1,0 +1,180 @@
+/**
+ * print.css
+ * Styling khusus saat halaman dicetak (Ctrl+P / tombol Cetak Hasil).
+ * Hanya aktif dalam mode @media print.
+ */
+
+@media print {
+
+  /* ── Sembunyikan elemen yang tidak perlu dicetak ── */
+  .navbar,
+  .hero,
+  .progress-section,
+  .btn-row,
+  .print-btn-row,
+  .footer,
+  .minat-tabs,
+  .all-jurusan {
+    display: none !important;
+  }
+
+  /* ── Tampilkan hanya step hasil ── */
+  .step-panel              { display: none !important; }
+  .step-panel#step-hasil   { display: block !important; }
+
+  /* ── Reset layout untuk kertas ── */
+  body {
+    background: #fff !important;
+    font-size: 11pt;
+    color: #000;
+    font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  }
+
+  .main {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* ── Header hasil ── */
+  .hasil-header {
+    background: #005F8E !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color: #fff !important;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .hasil-header h2 { font-size: 16pt; }
+  .hasil-header p  { font-size: 10pt; }
+
+  /* ── Rank cards ── */
+  .rank-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    border: 1pt solid #ccc !important;
+    margin-bottom: 10pt;
+    padding: 12pt;
+  }
+
+  .rank-card.rank-1 { border-color: #F5A623 !important; }
+  .rank-card.rank-2 { border-color: #A8A8A8 !important; }
+  .rank-card.rank-3 { border-color: #A0522D !important; }
+
+  /* Strip kiri warna tetap tercetak */
+  .rank-card::before {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── Bar skor ── */
+  .skor-bar-wrap {
+    margin: 6pt 0;
+  }
+
+  .skor-bar-track {
+    background: #eee !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .skor-bar-fill {
+    background: #0085C8 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .rank-card.rank-1 .skor-bar-fill {
+    background: #F5A623 !important;
+  }
+
+  /* ── Label kesesuaian ── */
+  .kesesuaian-label {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── Prospek kerja ── */
+  .prospek-box {
+    background: #E6F4FB !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border-radius: 6px;
+    padding: 8pt;
+    font-size: 9.5pt;
+  }
+
+  /* ── Stat pills ── */
+  .stat-pill {
+    border: 0.5pt solid #ccc !important;
+    font-size: 9pt;
+    padding: 2pt 7pt;
+  }
+
+  /* ── Halaman baru sebelum daftar semua jurusan ── */
+  .all-jurusan {
+    display: block !important;
+    page-break-before: always;
+    border: 1pt solid #ccc;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .all-jurusan-title {
+    background: #f5f5f5 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 9pt;
+    padding: 8pt 12pt;
+  }
+
+  .all-row {
+    padding: 6pt 12pt;
+    font-size: 9pt;
+  }
+
+  .all-bar-fill {
+    background: #0085C8 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── Header cetak tambahan ── */
+  .print-only-header {
+    display: block !important;
+    text-align: center;
+    margin-bottom: 16pt;
+    padding-bottom: 10pt;
+    border-bottom: 1.5pt solid #0085C8;
+  }
+
+  .print-only-header img {
+    width: 40pt;
+    margin-bottom: 6pt;
+  }
+
+  .print-only-header h2 {
+    font-size: 13pt;
+    color: #005F8E;
+    margin-bottom: 2pt;
+  }
+
+  .print-only-header p {
+    font-size: 9pt;
+    color: #666;
+  }
+
+  /* ── Footer cetak ── */
+  @page {
+    size: A4;
+    margin: 20mm 15mm 20mm 15mm;
+  }
+}
+
+/* Sembunyikan elemen print-only saat di layar */
+@media screen {
+  .print-only-header { display: none; }
+}

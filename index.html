@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistem Rekomendasi Jurusan — UNS</title>
+  <link rel="stylesheet" href="src/css/style.css" />
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══════════════════════════════════════════════ -->
+<nav class="navbar">
+  <a class="navbar-brand" href="#">
+    <img src="images/logo.png" alt="Logo UNS" class="navbar-logo" />
+    <div>
+      <span class="navbar-title">RekomendasiJurusan</span>
+      <span class="navbar-subtitle">Universitas Sebelas Maret</span>
+    </div>
+  </a>
+  <div style="font-size:12px;color:var(--gray-400);">Fuzzy Logic · Mamdani</div>
+</nav>
+
+<!-- ═══ HERO ══════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-images">
+    <img src="images/toga.png" alt="Toga wisuda" class="hero-img toga" />
+    <img src="images/jas.png"  alt="Jas almamater UNS" class="hero-img jas"  />
+  </div>
+  <div class="hero-badge">Sistem Pakar · Berbasis AI</div>
+  <h1>Temukan Jurusan Kuliah<br/>yang Paling Tepat Untukmu</h1>
+  <p>Menggunakan metode Fuzzy Logic Mamdani untuk menganalisis nilai akademik, minat, dan kemampuan TPA-mu.</p>
+  <div class="hero-steps">
+    <div class="hero-step"><div class="hero-step-num">1</div>Data diri</div>
+    <div class="hero-step"><div class="hero-step-num">2</div>Nilai akademik</div>
+    <div class="hero-step"><div class="hero-step-num">3</div>Kuesioner minat</div>
+    <div class="hero-step"><div class="hero-step-num">4</div>Tes TPA</div>
+    <div class="hero-step"><div class="hero-step-num">5</div>Hasil rekomendasi</div>
+  </div>
+</section>
+
+<!-- ═══ PROGRESS BAR ══════════════════════════════════════════ -->
+<div class="progress-section">
+  <div class="progress-header">
+    <span class="progress-label" id="progressLabel">Langkah 1 dari 5 — Data Diri</span>
+    <span class="progress-count" id="progressCount">20%</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:20%"></div>
+  </div>
+  <div class="step-dots" id="stepDots">
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ══════════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- ── STEP 0: Data Diri ─────────────────────────────────── -->
+  <div class="step-panel active" id="step-profil">
+    <div class="section-eyebrow">Langkah 1</div>
+    <div class="section-title">Data Diri</div>
+    <div class="section-desc">Masukkan nama dan pilih jurusan SMA-mu untuk memulai proses rekomendasi.</div>
+
+    <div class="card">
+      <div class="form-group">
+        <label class="form-label" for="inputNama">Nama Lengkap</label>
+        <input class="form-input" type="text" id="inputNama" placeholder="Masukkan namamu..." />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Jurusan SMA / MA</label>
+        <div class="radio-group">
+          <div class="radio-card" id="card-mipa" onclick="pilihJurusanSMA('MIPA')">
+            <div class="radio-card-icon">🔬</div>
+            <div>
+              <div class="radio-card-text">IPA / MIPA</div>
+              <div class="radio-card-sub">Mat · Fisika · Bio · Kimia</div>
+            </div>
+          </div>
+          <div class="radio-card" id="card-ips" onclick="pilihJurusanSMA('IPS')">
+            <div class="radio-card-icon">📈</div>
+            <div>
+              <div class="radio-card-text">IPS</div>
+              <div class="radio-card-sub">Mat · Ekonomi · Sosiologi</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <span></span>
+      <button class="btn btn-primary" onclick="nextStep()">
+        Lanjut
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── STEP 1: Nilai Akademik ─────────────────────────────── -->
+  <div class="step-panel" id="step-akademik">
+    <div class="section-eyebrow">Langkah 2</div>
+    <div class="section-title">Nilai Akademik</div>
+    <div class="section-desc">Masukkan nilai rapor rata-rata untuk setiap mata pelajaran (0–100).</div>
+
+    <div class="card">
+      <div class="mapel-grid" id="mapelGrid">
+        <!-- diisi oleh JS -->
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="prevStep()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 4L3 8l4 4"/></svg>
+        Kembali
+      </button>
+      <button class="btn btn-primary" onclick="nextStep()">
+        Lanjut
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: Kuesioner Minat ────────────────────────────── -->
+  <div class="step-panel" id="step-minat">
+    <div class="section-eyebrow">Langkah 3</div>
+    <div class="section-title">Kuesioner Minat</div>
+    <div class="section-desc">
+      Jawab setiap pernyataan sesuai perasaanmu.<br/>
+      <strong>1</strong> = Sangat Tidak Setuju &nbsp;·&nbsp; <strong>4</strong> = Sangat Setuju
+    </div>
+
+    <div class="card">
+      <div class="minat-tabs" id="minatTabs">
+        <!-- diisi JS -->
+      </div>
+      <div class="pernyataan-list" id="pernyataanList">
+        <!-- diisi JS -->
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="prevStep()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 4L3 8l4 4"/></svg>
+        Kembali
+      </button>
+      <button class="btn btn-primary" onclick="nextStep()">
+        Lanjut
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: TPA ─────────────────────────────────────────── -->
+  <div class="step-panel" id="step-tpa">
+    <div class="section-eyebrow">Langkah 4</div>
+    <div class="section-title">Tes Potensi Akademik (TPA)</div>
+    <div class="section-desc">Kerjakan soal-soal berikut. Jawaban benar/salah langsung ditampilkan setelah memilih.</div>
+
+    <div class="card" id="tpaCard">
+      <!-- diisi JS -->
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="btnTpaPrev" onclick="tpaPrev()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 4L3 8l4 4"/></svg>
+        Kembali
+      </button>
+      <button class="btn btn-primary" id="btnTpaNext" onclick="tpaNext()">
+        Lanjut
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── STEP 4: Hasil ───────────────────────────────────────── -->
+  <div class="step-panel" id="step-hasil">
+    <div id="hasilContent">
+      <!-- diisi JS -->
+    </div>
+
+    <div class="print-btn-row">
+      <button class="btn btn-gold" onclick="window.print()">
+        🖨️ Cetak Hasil
+      </button>
+      <button class="btn btn-ghost" onclick="mulaiUlang()">
+        🔄 Mulai Ulang
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+<footer class="footer">
+  <img src="images/logo.png" alt="UNS" class="footer-logo" />
+  <p>Sistem Rekomendasi Jurusan · Universitas Sebelas Maret · Metode Fuzzy Logic Mamdani</p>
+  <p style="margin-top:4px">Dikembangkan sebagai tugas praktikum pemrograman web</p>
+</footer>
+
+<!-- ═══ SCRIPTS ═══════════════════════════════════════════════ -->
+<script src="src/js/utils.js"></script>
+<script src="src/js/data.js"></script>
+<script src="src/js/fuzzy.js"></script>
+<script src="src/js/app.js"></script>
+
+</body>
+</html>

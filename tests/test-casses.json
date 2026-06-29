@@ -1,0 +1,302 @@
+{
+  "meta": {
+    "versi": "1.0",
+    "deskripsi": "Test cases untuk sistem rekomendasi jurusan UNS — Fuzzy Logic Mamdani",
+    "unit": "Nilai 0–100 untuk akademik & TPA; skor minat 0–100 (hasil konversi Likert)"
+  },
+
+  "fuzzy_unit_tests": [
+    {
+      "id": "FU-01",
+      "deskripsi": "Semua nilai tinggi → skor maksimal",
+      "input":  { "akVal": 90, "tpaVal": 90, "minatVal": 90 },
+      "ekspektasi": { "skor": 4.0, "persentase": 100, "kategori": { "ak": "tinggi", "tpa": "tinggi", "minat": "tinggi" } }
+    },
+    {
+      "id": "FU-02",
+      "deskripsi": "Semua nilai sedang → skor sedang",
+      "input":  { "akVal": 70, "tpaVal": 70, "minatVal": 70 },
+      "ekspektasi": { "skor": 2.0, "persentase": 50, "kategori": { "ak": "sedang", "tpa": "sedang", "minat": "sedang" } }
+    },
+    {
+      "id": "FU-03",
+      "deskripsi": "Semua nilai rendah → skor minimal",
+      "input":  { "akVal": 20, "tpaVal": 20, "minatVal": 20 },
+      "ekspektasi": { "skor": 1.0, "persentase": 25, "kategori": { "ak": "rendah", "tpa": "rendah", "minat": "rendah" } }
+    },
+    {
+      "id": "FU-04",
+      "deskripsi": "Akademik & TPA tinggi, minat sedang",
+      "input":  { "akVal": 88, "tpaVal": 85, "minatVal": 72 },
+      "ekspektasi": { "skor": 3.0, "kategori": { "ak": "tinggi", "tpa": "tinggi", "minat": "sedang" } }
+    },
+    {
+      "id": "FU-05",
+      "deskripsi": "Akademik tinggi, TPA sedang, minat tinggi",
+      "input":  { "akVal": 90, "tpaVal": 72, "minatVal": 88 },
+      "ekspektasi": { "skor": 3.0, "kategori": { "ak": "tinggi", "tpa": "sedang", "minat": "tinggi" } }
+    },
+    {
+      "id": "FU-06",
+      "deskripsi": "Nilai batas bawah tinggi (tepat 70)",
+      "input":  { "akVal": 70, "tpaVal": 70, "minatVal": 70 },
+      "ekspektasi": { "kategori": { "ak": "sedang", "tpa": "sedang", "minat": "sedang" } }
+    },
+    {
+      "id": "FU-07",
+      "deskripsi": "Nilai batas atas rendah (tepat 60)",
+      "input":  { "akVal": 60, "tpaVal": 60, "minatVal": 60 },
+      "ekspektasi": { "kategori": { "ak": "rendah", "tpa": "rendah", "minat": "rendah" } }
+    },
+    {
+      "id": "FU-08",
+      "deskripsi": "Rule tidak terdefinisi → fallback weighted average",
+      "input":  { "akVal": 85, "tpaVal": 30, "minatVal": 90 },
+      "ekspektasi": { "note": "Fallback digunakan karena kombinasi tinggi-rendah-tinggi tidak ada di FUZZY_RULES" }
+    }
+  ],
+
+  "minat_score_tests": [
+    {
+      "id": "MS-01",
+      "deskripsi": "Semua jawaban 4 (Sangat Setuju) → nilai maksimal 100",
+      "input":  { "Teknologi": [4,4,4,4,4] },
+      "ekspektasi": { "Teknologi": 100 }
+    },
+    {
+      "id": "MS-02",
+      "deskripsi": "Semua jawaban 1 (Sangat Tidak Setuju) → nilai minimal 0",
+      "input":  { "Teknologi": [1,1,1,1,1] },
+      "ekspektasi": { "Teknologi": 0 }
+    },
+    {
+      "id": "MS-03",
+      "deskripsi": "Semua jawaban 2 → nilai rendah",
+      "input":  { "Bisnis": [2,2,2,2,2] },
+      "ekspektasi": { "Bisnis": 33.3 }
+    },
+    {
+      "id": "MS-04",
+      "deskripsi": "Semua jawaban 3 → nilai sedang",
+      "input":  { "Kesehatan": [3,3,3,3,3] },
+      "ekspektasi": { "Kesehatan": 66.7 }
+    },
+    {
+      "id": "MS-05",
+      "deskripsi": "Jawaban campuran → nilai menengah",
+      "input":  { "Komunikasi": [1,2,3,4,4] },
+      "ekspektasi": { "Komunikasi": 53.3 }
+    }
+  ],
+
+  "akademik_tests": [
+    {
+      "id": "AK-MIPA-01",
+      "deskripsi": "Siswa MIPA nilai tinggi semua → kategori Teknologi tinggi",
+      "jurusanSMA": "MIPA",
+      "input": {
+        "Matematika": 90, "Fisika": 88, "Biologi": 85, "Kimia": 82, "Bahasa Inggris": 80
+      },
+      "ekspektasi": {
+        "Teknologi":  89,
+        "Kesehatan":  83.5,
+        "Bisnis":     90,
+        "Komunikasi": 80
+      }
+    },
+    {
+      "id": "AK-MIPA-02",
+      "deskripsi": "Siswa MIPA unggul Bio & Kimia → Kesehatan tinggi",
+      "jurusanSMA": "MIPA",
+      "input": {
+        "Matematika": 70, "Fisika": 65, "Biologi": 92, "Kimia": 90, "Bahasa Inggris": 75
+      },
+      "ekspektasi": {
+        "Teknologi":  67.5,
+        "Kesehatan":  91,
+        "Bisnis":     70,
+        "Komunikasi": 75
+      }
+    },
+    {
+      "id": "AK-IPS-01",
+      "deskripsi": "Siswa IPS nilai tinggi semua → Bisnis tinggi",
+      "jurusanSMA": "IPS",
+      "input": {
+        "Matematika": 88, "Ekonomi": 90, "Sosiologi": 85, "Bahasa Inggris": 82
+      },
+      "ekspektasi": {
+        "Teknologi":  88,
+        "Kesehatan":  0,
+        "Bisnis":     89,
+        "Komunikasi": 83.5
+      }
+    },
+    {
+      "id": "AK-IPS-02",
+      "deskripsi": "Siswa IPS unggul Bahasa Inggris & Sosiologi → Komunikasi tinggi",
+      "jurusanSMA": "IPS",
+      "input": {
+        "Matematika": 70, "Ekonomi": 72, "Sosiologi": 90, "Bahasa Inggris": 92
+      },
+      "ekspektasi": {
+        "Teknologi":  70,
+        "Kesehatan":  0,
+        "Bisnis":     71,
+        "Komunikasi": 91
+      }
+    }
+  ],
+
+  "end_to_end_tests": [
+    {
+      "id": "E2E-01",
+      "deskripsi": "Siswa MIPA tipikal Informatika — Mat & Fisika tinggi, minat Teknologi tinggi, TPA Logika tinggi",
+      "jurusanSMA": "MIPA",
+      "nilaiMapel": {
+        "Matematika": 92, "Fisika": 90, "Biologi": 70, "Kimia": 72, "Bahasa Inggris": 78
+      },
+      "minatAnswers": {
+        "Teknologi":  [4,4,4,4,4],
+        "Kesehatan":  [2,2,1,2,1],
+        "Bisnis":     [2,3,2,2,2],
+        "Komunikasi": [3,3,2,3,2],
+        "Sosial":     [2,3,2,3,2]
+      },
+      "tpaAnswers": {
+        "logika":  [1,1,2,2,1],
+        "numerik": [1,2,1,2,2],
+        "verbal":  [1,2,1,3,2]
+      },
+      "ekspektasi": {
+        "top1": "Informatika",
+        "catatan": "Informatika harusnya muncul sebagai rekomendasi utama"
+      }
+    },
+    {
+      "id": "E2E-02",
+      "deskripsi": "Siswa MIPA tipikal Kedokteran — Bio & Kimia tinggi, minat Kesehatan tinggi",
+      "jurusanSMA": "MIPA",
+      "nilaiMapel": {
+        "Matematika": 78, "Fisika": 75, "Biologi": 93, "Kimia": 91, "Bahasa Inggris": 80
+      },
+      "minatAnswers": {
+        "Teknologi":  [2,2,1,2,1],
+        "Kesehatan":  [4,4,4,4,4],
+        "Bisnis":     [2,2,2,2,2],
+        "Komunikasi": [3,3,3,2,2],
+        "Sosial":     [3,3,3,3,3]
+      },
+      "tpaAnswers": {
+        "logika":  [1,1,2,2,1],
+        "numerik": [1,2,1,2,2],
+        "verbal":  [1,2,1,3,2]
+      },
+      "ekspektasi": {
+        "top1": "Kedokteran",
+        "catatan": "Kedokteran harusnya muncul sebagai rekomendasi utama"
+      }
+    },
+    {
+      "id": "E2E-03",
+      "deskripsi": "Siswa IPS tipikal Akuntansi — Matematika & Ekonomi tinggi, minat Bisnis tinggi",
+      "jurusanSMA": "IPS",
+      "nilaiMapel": {
+        "Matematika": 90, "Ekonomi": 92, "Sosiologi": 75, "Bahasa Inggris": 78
+      },
+      "minatAnswers": {
+        "Teknologi":  [2,2,2,2,2],
+        "Kesehatan":  [1,1,2,1,1],
+        "Bisnis":     [4,4,4,4,4],
+        "Komunikasi": [2,3,2,3,2],
+        "Sosial":     [2,2,3,2,2]
+      },
+      "tpaAnswers": {
+        "logika":  [1,1,2,2,1],
+        "numerik": [1,2,1,2,2],
+        "verbal":  [1,2,1,3,2]
+      },
+      "ekspektasi": {
+        "top1": "Akuntansi",
+        "catatan": "Akuntansi harusnya muncul sebagai rekomendasi utama; Kedokteran & rumpun Kesehatan tidak muncul untuk IPS"
+      }
+    },
+    {
+      "id": "E2E-04",
+      "deskripsi": "Siswa IPS tipikal Ilmu Komunikasi — Sosiologi & Bahasa Inggris tinggi, minat Komunikasi tinggi",
+      "jurusanSMA": "IPS",
+      "nilaiMapel": {
+        "Matematika": 70, "Ekonomi": 72, "Sosiologi": 91, "Bahasa Inggris": 93
+      },
+      "minatAnswers": {
+        "Teknologi":  [2,2,1,2,1],
+        "Kesehatan":  [1,1,1,1,1],
+        "Bisnis":     [2,2,3,2,2],
+        "Komunikasi": [4,4,4,4,4],
+        "Sosial":     [3,3,3,4,3]
+      },
+      "tpaAnswers": {
+        "logika":  [1,1,2,2,1],
+        "numerik": [1,2,1,2,2],
+        "verbal":  [1,2,1,3,2]
+      },
+      "ekspektasi": {
+        "top1": "Ilmu Komunikasi",
+        "catatan": "Ilmu Komunikasi harusnya muncul sebagai rekomendasi utama"
+      }
+    },
+    {
+      "id": "E2E-05",
+      "deskripsi": "Siswa MIPA nilai merata (tidak menonjol di mana-mana) → hasil tidak ekstrem",
+      "jurusanSMA": "MIPA",
+      "nilaiMapel": {
+        "Matematika": 70, "Fisika": 70, "Biologi": 70, "Kimia": 70, "Bahasa Inggris": 70
+      },
+      "minatAnswers": {
+        "Teknologi":  [2,2,2,2,2],
+        "Kesehatan":  [2,2,2,2,2],
+        "Bisnis":     [2,2,2,2,2],
+        "Komunikasi": [2,2,2,2,2],
+        "Sosial":     [2,2,2,2,2]
+      },
+      "tpaAnswers": {
+        "logika":  [1,1,2,2,1],
+        "numerik": [1,2,1,2,2],
+        "verbal":  [1,2,1,3,2]
+      },
+      "ekspektasi": {
+        "catatan": "Semua jurusan harusnya muncul dengan skor hampir sama (tidak ada dominasi)"
+      }
+    }
+  ],
+
+  "edge_case_tests": [
+    {
+      "id": "EC-01",
+      "deskripsi": "TPA skor 0% (semua salah) → tidak crash, skor tetap terhitung",
+      "tpaVals": { "logika": 0, "numerik": 0, "verbal": 0 },
+      "ekspektasi": { "error": false }
+    },
+    {
+      "id": "EC-02",
+      "deskripsi": "TPA skor 100% (semua benar) → skor maksimal",
+      "tpaVals": { "logika": 100, "numerik": 100, "verbal": 100 },
+      "ekspektasi": { "error": false }
+    },
+    {
+      "id": "EC-03",
+      "deskripsi": "Siswa IPS — jurusan rumpun Kesehatan tidak boleh muncul",
+      "jurusanSMA": "IPS",
+      "ekspektasi": {
+        "jurusan_tidak_muncul": ["Kedokteran", "Keperawatan", "Gizi"],
+        "catatan": "hitungSemuaJurusan harus skip jurusan Kesehatan untuk IPS"
+      }
+    },
+    {
+      "id": "EC-04",
+      "deskripsi": "Nama kosong → fallback ke 'Peserta'",
+      "input": { "nama": "" },
+      "ekspektasi": { "nama_digunakan": "Peserta" }
+    }
+  ]
+}
