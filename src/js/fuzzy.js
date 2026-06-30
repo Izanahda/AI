@@ -1,171 +1,165 @@
 /**
  * fuzzy.js
- * Implementasi Fuzzy Logic Mamdani untuk sistem rekomendasi jurusan.
- * Diterjemahkan dari fuzzy_model.py ke JavaScript.
+ * Core engine Fuzzy Logic Mamdani.
+ * File ini adalah acuan utama — jangan ubah logika di dalamnya
+ * kecuali ada perubahan metode yang disengaja.
+ *
+ * Dependensi: data.js (JURUSAN, PROSPEK) harus dimuat lebih dulu.
  */
 
-const FUZZY_RULES = {
-  "tinggi,tinggi,tinggi": 4.0,
-  "sedang,tinggi,tinggi": 3.0,
-  "tinggi,tinggi,sedang": 3.0,
-  "tinggi,sedang,tinggi": 3.0,
-  "sedang,sedang,sedang": 2.0,
-  "tinggi,sedang,sedang": 2.5,
-  "sedang,tinggi,sedang": 2.5,
-  "rendah,rendah,rendah": 1.0,
-  "rendah,sedang,rendah": 1.5,
-  "rendah,rendah,sedang": 1.5,
+// ── Engine Fuzzy (object) ───────────────────────────────────
+const Fuzzy = {
+
+  /**
+   * Fuzzifikasi nilai (0–100) ke derajat keanggotaan.
+   * @param {number} n - nilai input
+   * @returns {{rendah, sedang, tinggi}} derajat keanggotaan ternormalisasi
+   */
+  fuzzify(n) {
+    // Fungsi keanggotaan RENDAH
+    const r = n <= 60 ? Math.max(0, Math.min(1, (60 - n) / 60)) : 0;
+
+    // Fungsi keanggotaan SEDANG
+    let s = 0;
+    if      (n <= 50) s = 0;
+    else if (n <= 65) s = (n - 50) / 15;
+    else if (n <= 80) s = 1;
+    else              s = Math.max(0, (100 - n) / 20);
+
+    // Fungsi keanggotaan TINGGI
+    const t = n <= 70 ? 0 : Math.min(1, (n - 70) / 30);
+
+    const sum = r + s + t || 1;
+    return { rendah: r / sum, sedang: s / sum, tinggi: t / sum };
+  },
+
+  /**
+   * Kategori dominan dari nilai input.
+   * @param {number} n - nilai input
+   * @returns {'rendah'|'sedang'|'tinggi'}
+   */
+  dom(n) {
+    const f = this.fuzzify(n);
+    return Object.entries(f).sort((a, b) => b[1] - a[1])[0][0];
+  },
+
+  /**
+   * Tabel aturan Mamdani (IF-THEN rules).
+   * Key: "kategori_ak,kategori_tpa,kategori_minat"
+   * Value: skor output (1–4)
+   */
+  RULES: {
+    "tinggi,tinggi,tinggi": 4,
+    "sedang,tinggi,tinggi": 3,
+    "tinggi,tinggi,sedang": 3,
+    "sedang,sedang,sedang": 2,
+    "rendah,rendah,rendah": 1,
+  },
+
+  /**
+   * Hitung skor fuzzy untuk satu kombinasi nilai input.
+   * Jika rule tidak ditemukan → weighted average (defuzzifikasi fallback).
+   *
+   * @param {number} ak    - nilai akademik (0–100)
+   * @param {number} tp    - nilai TPA (0–100)
+   * @param {number} mi    - nilai minat (0–100)
+   * @returns {{skor, pct, combo}}
+   */
+  skor(ak, tp, mi) {
+    const key = `${this.dom(ak)},${this.dom(tp)},${this.dom(mi)}`;
+    let s = this.RULES[key];
+
+    if (s === undefined) {
+      // Defuzzifikasi: weighted average
+      const fa = this.fuzzify(ak);
+      const ft = this.fuzzify(tp);
+      const fm = this.fuzzify(mi);
+      s = (
+        fa.tinggi * 4 + fa.sedang * 2.5 + fa.rendah * 1 +
+        ft.tinggi * 4 + ft.sedang * 2.5 + ft.rendah * 1 +
+        fm.tinggi * 4 + fm.sedang * 2.5 + fm.rendah * 1
+      ) / 3;
+    }
+
+    return {
+      skor:  Math.round(s * 100) / 100,
+      pct:   Math.round((s / 4) * 100),
+      combo: [this.dom(ak), this.dom(tp), this.dom(mi)]
+    };
+  }
 };
 
-/**
- * Fuzzifikasi nilai (0–100) ke derajat keanggotaan rendah/sedang/tinggi.
- * Fungsi keanggotaan trapesium/segitiga.
- */
-function fuzzify(nilai) {
-  // Fungsi keanggotaan RENDAH (turun dari 60 ke bawah)
-  let rendah = 0;
-  if (nilai <= 0)  rendah = 1;
-  else if (nilai < 60) rendah = (60 - nilai) / 60;
-  else rendah = 0;
-
-  // Fungsi keanggotaan SEDANG (naik 50–65, plateau 65–80, turun 80–100)
-  let sedang = 0;
-  if (nilai <= 50)       sedang = 0;
-  else if (nilai <= 65)  sedang = (nilai - 50) / 15;
-  else if (nilai <= 80)  sedang = 1;
-  else                   sedang = Math.max(0, (100 - nilai) / 20);
-
-  // Fungsi keanggotaan TINGGI (naik dari 70 ke 100)
-  let tinggi = 0;
-  if (nilai <= 70)  tinggi = 0;
-  else if (nilai <= 100) tinggi = (nilai - 70) / 30;
-  else tinggi = 1;
-
-  // Normalisasi
-  const total = rendah + sedang + tinggi || 1;
-  return {
-    rendah: rendah / total,
-    sedang: sedang / total,
-    tinggi: tinggi / total
-  };
-}
-
-/**
- * Tentukan kategori dominan dari nilai fuzzy.
- */
-function kategoriDominan(nilai) {
-  const f = fuzzify(nilai);
-  return Object.entries(f).sort((a, b) => b[1] - a[1])[0][0];
-}
-
-/**
- * Hitung skor fuzzy untuk satu jurusan berdasarkan nilai akademik, TPA, dan minat.
- * @returns {object} { skor, persentase, kategori }
- */
-function hitungSkorJurusan(akVal, tpaVal, minatVal) {
-  const akK   = kategoriDominan(akVal);
-  const tpaK  = kategoriDominan(tpaVal);
-  const miK   = kategoriDominan(minatVal);
-  const key   = `${akK},${tpaK},${miK}`;
-
-  let skor = FUZZY_RULES[key];
-
-  // Jika rule tidak ada → gunakan defuzzifikasi weighted average
-  if (skor === undefined) {
-    const fA = fuzzify(akVal);
-    const fT = fuzzify(tpaVal);
-    const fM = fuzzify(minatVal);
-    const skorAk   = fA.tinggi * 4 + fA.sedang * 2.5 + fA.rendah * 1;
-    const skorTpa  = fT.tinggi * 4 + fT.sedang * 2.5 + fT.rendah * 1;
-    const skorMi   = fM.tinggi * 4 + fM.sedang * 2.5 + fM.rendah * 1;
-    skor = (skorAk + skorTpa + skorMi) / 3;
-  }
-
-  skor = Math.round(skor * 100) / 100;
-  const persentase = Math.round((skor / 4) * 100);
-
-  return {
-    skor,
-    persentase,
-    kategori: { ak: akK, tpa: tpaK, minat: miK }
-  };
-}
-
+// ── Fungsi Akademik ─────────────────────────────────────────
 /**
  * Hitung nilai akademik per kategori dari nilai mapel.
+ * @param {object} mapel - { "Matematika": 80, "Fisika": 75, ... }
+ * @param {'MIPA'|'IPS'} sma
+ * @returns {object} nilai per kategori { Teknologi, Kesehatan, Bisnis, Komunikasi, Sosial }
  */
-function hitungAkademikPerKategori(nilaiMapel, jurusanSMA) {
-  const avg = (...keys) => {
-    const vals = keys.filter(k => nilaiMapel[k] !== undefined).map(k => nilaiMapel[k]);
-    return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+function hitungAkademik(mapel, sma) {
+  const avg = (...k) => {
+    const v = k.map(x => parseFloat(mapel[x] || 0));
+    return v.reduce((a, b) => a + b, 0) / v.length;
   };
 
-  if (jurusanSMA === "MIPA") {
-    return {
-      Teknologi:  avg("Matematika", "Fisika"),
-      Kesehatan:  avg("Biologi", "Kimia"),
-      Bisnis:     avg("Matematika"),
-      Komunikasi: avg("Bahasa Inggris")
-    };
-  } else {
-    return {
-      Teknologi:  avg("Matematika"),
-      Kesehatan:  0,
-      Bisnis:     avg("Matematika", "Ekonomi"),
-      Komunikasi: avg("Bahasa Inggris", "Sosiologi")
-    };
-  }
+  return sma === 'MIPA'
+    ? {
+        Teknologi:  avg('Matematika', 'Fisika'),
+        Kesehatan:  avg('Biologi', 'Kimia'),
+        Bisnis:     avg('Matematika'),
+        Komunikasi: avg('Bahasa Inggris'),
+        Sosial:     avg('Bahasa Inggris')
+      }
+    : {
+        Teknologi:  avg('Matematika'),
+        Kesehatan:  0,
+        Bisnis:     avg('Matematika', 'Ekonomi'),
+        Komunikasi: avg('Bahasa Inggris', 'Sosiologi'),
+        Sosial:     avg('Sosiologi')
+      };
 }
 
+// ── Fungsi Hitung Semua Jurusan ─────────────────────────────
 /**
- * Hitung skor semua jurusan dan urutkan.
+ * Hitung skor semua jurusan dan kembalikan urutan terbaik.
+ * @param {object} akPerKat  - output hitungAkademik()
+ * @param {object} tpaVals   - { logika: 80, numerik: 60, verbal: 70 }
+ * @param {object} minatVals - { Teknologi: 85, Kesehatan: 50, ... }
+ * @param {'MIPA'|'IPS'} sma
+ * @returns {Array} array hasil jurusan terurut dari skor tertinggi
  */
-function hitungSemuaJurusan(nilaiMapel, jurusanSMA, tpaVals, minatVals) {
-  const akPer = hitungAkademikPerKategori(nilaiMapel, jurusanSMA);
-  const hasil = [];
-
-  for (const [jurusan, def] of Object.entries(JURUSAN_DEF)) {
-    if (jurusanSMA === "IPS" && def.ak === "Kesehatan") continue;
-
-    const akVal    = akPer[def.ak]    || 0;
-    const tpaVal   = tpaVals[def.tpa] || 0;
-    const minatVal = minatVals[def.minat] || 0;
-
-    const { skor, persentase, kategori } = hitungSkorJurusan(akVal, tpaVal, minatVal);
-
-    hasil.push({
-      jurusan,
-      skor,
-      persentase,
-      kategori,
-      akVal:    Math.round(akVal),
-      tpaVal:   Math.round(tpaVal),
-      minatVal: Math.round(minatVal)
-    });
-  }
-
-  return hasil.sort((a, b) => b.skor - a.skor);
+function hitungSemua(akPerKat, tpaVals, minatVals, sma) {
+  return Object.entries(JURUSAN)
+    .filter(([, d]) => !(sma === 'IPS' && d.ak === 'Kesehatan'))
+    .map(([jurusan, d]) => {
+      const ak = akPerKat[d.ak]  || 0;
+      const tp = tpaVals[d.tpa]  || 0;
+      const mi = minatVals[d.mi] || 0;
+      const { skor, pct, combo } = Fuzzy.skor(ak, tp, mi);
+      return {
+        jurusan,
+        skor,
+        pct,
+        combo,
+        akVal:    Math.round(ak),
+        tpaVal:   Math.round(tp),
+        minatVal: Math.round(mi),
+        // Sebar data prospek & alasan dari PROSPEK
+        ...PROSPEK[jurusan]
+      };
+    })
+    .sort((a, b) => b.skor - a.skor);
 }
 
+// ── Label Kesesuaian ────────────────────────────────────────
 /**
- * Hitung nilai minat per kategori dari jawaban kuesioner.
+ * Kembalikan label teks dan class CSS berdasarkan skor.
+ * @param {number} s - skor (0–4)
+ * @returns {{t: string, c: string}}
  */
-function hitungNilaiMinat(minatAnswers) {
-  const hasil = {};
-  for (const [kat, answers] of Object.entries(minatAnswers)) {
-    const total = answers.reduce((a, b) => a + b, 0);
-    const nilai = ((total - 5) / 15) * 100;
-    hasil[kat] = Math.round(Math.max(0, Math.min(100, nilai)) * 10) / 10;
-  }
-  return hasil;
-}
-
-/**
- * Label kesesuaian berdasarkan skor.
- */
-function labelSkor(skor) {
-  if (skor >= 3.5) return { text: "Sangat Cocok",  cls: "label-sangat" };
-  if (skor >= 2.5) return { text: "Cocok",          cls: "label-cocok"  };
-  if (skor >= 1.5) return { text: "Cukup Cocok",    cls: "label-cukup"  };
-  return              { text: "Kurang Cocok",    cls: "label-kurang" };
+function labelSkor(s) {
+  if (s >= 3.5) return { t: 'Sangat Cocok ✨', c: 'l-sv' };
+  if (s >= 2.5) return { t: 'Cocok ✅',        c: 'l-co' };
+  if (s >= 1.5) return { t: 'Cukup Cocok',     c: 'l-ck' };
+  return              { t: 'Kurang Cocok',     c: 'l-ku' };
 }

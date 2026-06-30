@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Tes Penjurusan — PathFinder</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="src/css/style.css">
 </head>
 <body>
 
@@ -38,7 +38,7 @@
 
   <div class="fcard">
 
-    <!-- Step 0 -->
+    <!-- Step 0: Data Diri -->
     <div class="fsec active" id="s0">
       <div class="fcard-tag">Langkah 1 dari 6</div>
       <div class="fcard-title">Perkenalkan dirimu</div>
@@ -50,31 +50,47 @@
       </div>
       <div class="field" id="f-sma">
         <label>Jurusan SMA</label>
-        <select id="sma"><option value="">-- Pilih jurusan SMA --</option><option value="MIPA">MIPA</option><option value="IPS">IPS</option></select>
+        <select id="sma">
+          <option value="">-- Pilih jurusan SMA --</option>
+          <option value="MIPA">MIPA</option>
+          <option value="IPS">IPS</option>
+        </select>
         <div class="field-err-msg">Pilih jurusan SMA.</div>
       </div>
-      <div class="fnav"><div></div><button class="btn btn-p" onclick="goNext()">Lanjut</button></div>
+      <div class="fnav">
+        <div></div>
+        <button class="btn btn-p" onclick="goNext()">Lanjut</button>
+      </div>
     </div>
 
-    <!-- Step 1 -->
+    <!-- Step 1: Nilai Akademik -->
     <div class="fsec" id="s1">
       <div class="fcard-tag">Langkah 2 dari 6</div>
       <div class="fcard-title">Nilai Akademik</div>
       <div class="fcard-desc">Masukkan nilai rapor terakhirmu dengan jujur (0–100).</div>
       <div id="mapelBox"></div>
-      <div class="fnav"><button class="btn btn-g" onclick="goPrev()">Kembali</button><button class="btn btn-p" onclick="goNext()">Lanjut</button></div>
+      <div class="fnav">
+        <button class="btn btn-g" onclick="goPrev()">Kembali</button>
+        <button class="btn btn-p" onclick="goNext()">Lanjut</button>
+      </div>
     </div>
 
-    <!-- Step 2 -->
+    <!-- Step 2: Kuisioner Minat -->
     <div class="fsec" id="s2">
       <div class="fcard-tag">Langkah 3 dari 6</div>
       <div class="fcard-title">Kuisioner Minat</div>
-      <div class="fcard-desc">Semua pernyataan wajib dijawab.<br>1 = Sangat Tidak Setuju &nbsp; 2 = Tidak Setuju &nbsp; 3 = Setuju &nbsp; 4 = Sangat Setuju</div>
+      <div class="fcard-desc">
+        Semua pernyataan wajib dijawab.<br>
+        1 = Sangat Tidak Setuju &nbsp; 2 = Tidak Setuju &nbsp; 3 = Setuju &nbsp; 4 = Sangat Setuju
+      </div>
       <div id="minatBox"></div>
-      <div class="fnav"><button class="btn btn-g" onclick="goPrev()">Kembali</button><button class="btn btn-p" onclick="goNext()">Lanjut</button></div>
+      <div class="fnav">
+        <button class="btn btn-g" onclick="goPrev()">Kembali</button>
+        <button class="btn btn-p" onclick="goNext()">Lanjut</button>
+      </div>
     </div>
 
-    <!-- Welcome Logika -->
+    <!-- Step 3: Welcome Logika -->
     <div class="fsec" id="s3">
       <div class="ws">
         <span class="ws-icon">🧩</span>
@@ -87,10 +103,13 @@
         </div>
         <div style="font-size:12px;color:#9A8AA0;font-weight:600;">Timer mulai saat kamu menekan Mulai Tes.</div>
       </div>
-      <div class="fnav"><button class="btn btn-g" onclick="goPrev()">Kembali</button><button class="btn btn-p" onclick="startTPA('logika')">Mulai Tes</button></div>
+      <div class="fnav">
+        <button class="btn btn-g" onclick="goPrev()">Kembali</button>
+        <button class="btn btn-p" onclick="startTPA('logika')">Mulai Tes</button>
+      </div>
     </div>
 
-    <!-- Welcome Numerik -->
+    <!-- Step 4: Welcome Numerik -->
     <div class="fsec" id="s4">
       <div class="ws">
         <span class="ws-icon">🔢</span>
@@ -102,10 +121,13 @@
           <span class="ws-rule">Boleh corat-coret</span>
         </div>
       </div>
-      <div class="fnav"><button class="btn btn-g" onclick="goPrev()">Kembali</button><button class="btn btn-p" onclick="startTPA('numerik')">Mulai Tes</button></div>
+      <div class="fnav">
+        <button class="btn btn-g" onclick="goPrev()">Kembali</button>
+        <button class="btn btn-p" onclick="startTPA('numerik')">Mulai Tes</button>
+      </div>
     </div>
 
-    <!-- Welcome Verbal -->
+    <!-- Step 5: Welcome Verbal -->
     <div class="fsec" id="s5">
       <div class="ws">
         <span class="ws-icon">📖</span>
@@ -117,222 +139,38 @@
           <span class="ws-rule">Perhatikan konteks</span>
         </div>
       </div>
-      <div class="fnav"><button class="btn btn-g" onclick="goPrev()">Kembali</button><button class="btn btn-p" onclick="startTPA('verbal')">Mulai Tes</button></div>
+      <div class="fnav">
+        <button class="btn btn-g" onclick="goPrev()">Kembali</button>
+        <button class="btn btn-p" onclick="startTPA('verbal')">Mulai Tes</button>
+      </div>
     </div>
 
-    <!-- TPA panel -->
+    <!-- Panel TPA (aktif saat tes berlangsung) -->
     <div class="fsec" id="s-tpa">
       <div class="fcard-tag" id="tpaTag">TPA</div>
       <div class="fcard-title" id="tpaTitle">Soal</div>
       <div class="fcard-desc" id="tpaDesc">Pilih jawaban yang paling tepat.</div>
       <div id="soalBox"></div>
-      <div class="fnav"><div></div><button class="btn btn-p" onclick="selesaiTPA()">Selesai & Lanjut</button></div>
+      <div class="fnav">
+        <div></div>
+        <button class="btn btn-p" onclick="selesaiTPA()">Selesai &amp; Lanjut</button>
+      </div>
     </div>
 
-  </div>
-</div>
+  </div><!-- /fcard -->
+</div><!-- /page-wrap -->
 
-<script src="fuzzy.js"></script>
-<script>
-let step=0, timerInt=null, timerSec=600, timerMax=600, activeTPA='';
-const tpaAns={logika:{},numerik:{},verbal:{}};
+<!--
+  URUTAN SCRIPT PENTING:
+  1. data.js   → konstanta (SQ_LOG, PM, JURUSAN, dll)
+  2. fuzzy.js  → engine kalkulasi (butuh JURUSAN, PROSPEK dari data.js)
+  3. utils.js  → helper (esc, showToast, dll)
+  4. app.js    → controller alur (butuh semua di atas)
+-->
+<script src="src/js/data.js"></script>
+<script src="src/js/fuzzy.js"></script>
+<script src="src/js/utils.js"></script>
+<script src="src/js/app.js"></script>
 
-const MAPEL_MIPA=['Matematika','Biologi','Kimia','Fisika','Bahasa Inggris'];
-const MAPEL_IPS=['Matematika','Sosiologi','Ekonomi','Bahasa Inggris'];
-
-const SQ_LOG=[
-  {q:"Semua siswa rajin. Budi adalah siswa. Kesimpulan yang tepat adalah...",o:["A. Budi tidak rajin","B. Budi rajin","C. Budi mungkin rajin","D. Tidak dapat disimpulkan"],j:"B"},
-  {q:"Jika hari hujan maka jalanan basah. Jalanan basah. Maka...",o:["A. Pasti hari hujan","B. Belum tentu hari hujan","C. Hari tidak hujan","D. Jalanan kering"],j:"B"},
-  {q:"Semua A adalah B. Semua B adalah C. Maka...",o:["A. Semua C adalah A","B. Sebagian A adalah C","C. Semua A adalah C","D. Tidak ada A adalah C"],j:"C"},
-  {q:"Ani lebih tinggi dari Budi. Budi lebih tinggi dari Caca. Siapa yang paling pendek?",o:["A. Ani","B. Budi","C. Caca","D. Tidak dapat ditentukan"],j:"C"},
-  {q:"Deret: 2, 4, 8, 16, ... Bilangan selanjutnya adalah...",o:["A. 24","B. 28","C. 30","D. 32"],j:"D"},
-  {q:"Deret: 3, 6, 11, 18, 27, ... Bilangan selanjutnya adalah...",o:["A. 36","B. 38","C. 40","D. 42"],j:"B"},
-  {q:"Jika P maka Q. Tidak Q. Maka...",o:["A. P","B. Tidak P","C. Mungkin P","D. Tidak dapat disimpulkan"],j:"B"},
-  {q:"Semua guru adalah sarjana. Pak Rudi bukan sarjana. Maka...",o:["A. Pak Rudi adalah guru","B. Pak Rudi bukan guru","C. Mungkin Pak Rudi guru","D. Tidak bisa disimpulkan"],j:"B"},
-  {q:"Deret: 1, 1, 2, 3, 5, 8, ... Bilangan selanjutnya adalah...",o:["A. 11","B. 12","C. 13","D. 14"],j:"C"},
-  {q:"Semua hewan adalah makhluk hidup. Pohon adalah makhluk hidup. Maka...",o:["A. Pohon adalah hewan","B. Pohon mungkin hewan","C. Pohon bukan hewan","D. Tidak bisa disimpulkan"],j:"D"},
-];
-const SQ_NUM=[
-  {q:"Tentukan angka berikutnya: 3, 6, 12, 24, ...",o:["A. 36","B. 42","C. 48","D. 56"],j:"C"},
-  {q:"Hasil dari 15% × 200 adalah...",o:["A. 25","B. 30","C. 35","D. 40"],j:"B"},
-  {q:"Perbandingan A dan B adalah 2:3, jumlah mereka 50. Nilai A adalah...",o:["A. 15","B. 20","C. 25","D. 30"],j:"B"},
-  {q:"Diskon 20% pada harga Rp200.000. Harga setelah diskon adalah...",o:["A. Rp140.000","B. Rp150.000","C. Rp160.000","D. Rp180.000"],j:"C"},
-  {q:"Rata-rata dari 10, 20, 30, 40, 50 adalah...",o:["A. 25","B. 30","C. 35","D. 40"],j:"B"},
-  {q:"Jika 3x = 21, maka nilai x² adalah...",o:["A. 7","B. 14","C. 49","D. 21"],j:"C"},
-  {q:"Deret: 2, 6, 12, 20, ... Bilangan selanjutnya adalah...",o:["A. 28","B. 30","C. 32","D. 36"],j:"B"},
-  {q:"Harga naik 20% menjadi Rp120.000. Harga awal adalah...",o:["A. Rp90.000","B. Rp96.000","C. Rp100.000","D. Rp110.000"],j:"C"},
-  {q:"5 buku harganya Rp75.000. Harga 8 buku adalah...",o:["A. Rp100.000","B. Rp110.000","C. Rp115.000","D. Rp120.000"],j:"D"},
-  {q:"Persegi panjang 12×8 cm. Kelilingnya adalah...",o:["A. 36 cm","B. 40 cm","C. 44 cm","D. 48 cm"],j:"B"},
-];
-const SQ_VER=[
-  {q:"Sinonim dari kata ABADI adalah...",o:["A. Sementara","B. Kekal","C. Singkat","D. Hilang"],j:"B"},
-  {q:"Antonim dari kata OPTIMIS adalah...",o:["A. Semangat","B. Realistis","C. Pesimis","D. Dinamis"],j:"C"},
-  {q:"Dokter : Rumah Sakit = Guru : ...",o:["A. Buku","B. Murid","C. Sekolah","D. Papan tulis"],j:"C"},
-  {q:"Kata yang TIDAK berhubungan: Mawar, Melati, Anggrek, Mangga",o:["A. Mawar","B. Melati","C. Anggrek","D. Mangga"],j:"D"},
-  {q:"Sinonim dari kata MEWAH adalah...",o:["A. Sederhana","B. Megah","C. Murah","D. Biasa"],j:"B"},
-  {q:"Antonim dari kata KONSISTEN adalah...",o:["A. Tetap","B. Stabil","C. Berubah-ubah","D. Taat"],j:"C"},
-  {q:"Pena : Menulis = Pisau : ...",o:["A. Tajam","B. Memotong","C. Besi","D. Dapur"],j:"B"},
-  {q:"Kalimat dengan ejaan paling tepat adalah...",o:["A. Kami pergi ke-sekolah hari ini.","B. Kami pergi kesekolah hari ini.","C. Kami pergi ke sekolah hari ini.","D. Kami pergi Ke Sekolah hari ini."],j:"C"},
-  {q:"Sinonim dari kata INOVASI adalah...",o:["A. Tradisi","B. Pembaruan","C. Warisan","D. Konservatif"],j:"B"},
-  {q:"Buku : Membaca = Lagu : ...",o:["A. Nada","B. Musik","C. Mendengarkan","D. Radio"],j:"C"},
-];
-
-const PM={
-  "Teknologi":["Saya tertarik mempelajari cara kerja komputer dan perangkat digital.","Saya tertarik mencoba aplikasi atau teknologi baru.","Saya tertarik belajar pemrograman atau pengembangan aplikasi.","Saya suka memecahkan masalah yang membutuhkan logika.","Saya tertarik dengan perkembangan AI dan teknologi masa depan."],
-  "Kesehatan":["Saya tertarik mempelajari tubuh manusia dan cara kerjanya.","Saya senang membantu orang yang sedang sakit.","Saya tertarik mempelajari obat-obatan dan dunia medis.","Saya tertarik dengan materi biologi dan kesehatan.","Saya ingin berkontribusi meningkatkan kualitas kesehatan masyarakat."],
-  "Bisnis":["Saya tertarik mempelajari cara mengelola keuangan.","Saya tertarik membangun atau mengembangkan usaha sendiri.","Saya senang merencanakan untuk mencapai keuntungan.","Saya tertarik mempelajari pemasaran dan strategi bisnis.","Saya senang menganalisis peluang dan risiko dalam usaha."],
-  "Komunikasi":["Saya senang berbicara dan menyampaikan ide kepada orang lain.","Saya mudah beradaptasi saat berinteraksi dengan orang baru.","Saya tertarik membuat presentasi atau berbicara di depan umum.","Saya senang menulis, membuat konten, atau menyampaikan informasi.","Saya tertarik mempelajari media, komunikasi, dan hubungan masyarakat."],
-  "Sosial":["Saya tertarik memahami perilaku dan karakter manusia.","Saya senang membantu menyelesaikan masalah orang lain.","Saya tertarik mempelajari fenomena sosial di masyarakat.","Saya senang bekerja dalam kelompok.","Saya tertarik melakukan kegiatan pelayanan masyarakat."],
-};
-
-function updProg(){
-  document.querySelectorAll('.prog-step').forEach((el,i)=>{
-    el.classList.remove('active','done');
-    if(i<step) el.classList.add('done');
-    if(i===step) el.classList.add('active');
-  });
-}
-
-function showStep(n){
-  document.querySelectorAll('.fsec').forEach(s=>s.classList.remove('active'));
-  const el=document.getElementById('s'+n);
-  if(el){el.classList.add('active');}
-  window.scrollTo({top:0,behavior:'smooth'});
-  updProg();
-}
-
-function goNext(){
-  if(!validate()) return;
-  if(step===0) buildMapel();
-  if(step===1) buildMinat();
-  step++;
-  showStep(step);
-}
-function goPrev(){step=Math.max(0,step-1);showStep(step);}
-
-function validate(){
-  if(step===0){
-    let ok=true;
-    const nama=document.getElementById('nama');
-    const sma=document.getElementById('sma');
-    document.getElementById('f-nama').classList.toggle('err',!nama.value.trim());
-    document.getElementById('f-sma').classList.toggle('err',!sma.value);
-    if(!nama.value.trim()||!sma.value) ok=false;
-    return ok;
-  }
-  if(step===1){
-    let ok=true;
-    document.querySelectorAll('#mapelBox input').forEach(inp=>{
-      const v=parseFloat(inp.value);
-      const e=isNaN(v)||v<0||v>100||inp.value==='';
-      inp.closest('.field').classList.toggle('err',e);
-      if(e) ok=false;
-    });
-    return ok;
-  }
-  if(step===2){
-    let miss=0;
-    Object.entries(PM).forEach(([kat,ps])=>{
-      ps.forEach((_,i)=>{if(!document.querySelector(`.sk-btn.on[data-kat="${kat}"][data-idx="${i}"]`)) miss++;});
-    });
-    if(miss>0){alert(`Masih ada ${miss} pernyataan yang belum dijawab. Semua wajib diisi!`);return false;}
-    return true;
-  }
-  return true;
-}
-
-function buildMapel(){
-  const sma=document.getElementById('sma').value;
-  const ms=sma==='MIPA'?MAPEL_MIPA:MAPEL_IPS;
-  document.getElementById('mapelBox').innerHTML='<div class="fgrid2">'+ms.map(m=>`<div class="field" id="fm-${m.replace(/ /g,'_')}"><label>${m}</label><input type="number" id="v-${m.replace(/ /g,'_')}" min="0" max="100" placeholder="0–100"><div class="field-err-msg">Nilai harus 0–100.</div></div>`).join('')+'</div>';
-}
-
-function buildMinat(){
-  document.getElementById('minatBox').innerHTML=Object.entries(PM).map(([kat,ps])=>`
-  <div class="minat-cat">
-    <div class="minat-hd">${kat}</div>
-    ${ps.map((p,i)=>`<div class="prow"><div class="prow-txt">${i+1}. ${p}</div><div class="skala">${[1,2,3,4].map(n=>`<button class="sk-btn" data-kat="${kat}" data-idx="${i}" data-val="${n}" onclick="pickSk(this)">${n}</button>`).join('')}</div></div>`).join('')}
-  </div>`).join('');
-}
-
-function pickSk(btn){
-  const k=btn.dataset.kat,i=btn.dataset.idx;
-  document.querySelectorAll(`.sk-btn[data-kat="${k}"][data-idx="${i}"]`).forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-}
-
-function startTPA(type){
-  activeTPA=type;
-  const sq={logika:SQ_LOG,numerik:SQ_NUM,verbal:SQ_VER}[type];
-  document.getElementById('tpaTag').textContent='TPA '+type.charAt(0).toUpperCase()+type.slice(1);
-  document.getElementById('tpaTitle').textContent={logika:'Soal Logika',numerik:'Soal Numerik',verbal:'Soal Verbal'}[type];
-  document.getElementById('soalBox').innerHTML=sq.map((s,si)=>`
-  <div class="soal" id="sq${si}">
-    <div class="soal-num">Soal ${si+1} dari ${sq.length}</div>
-    <div class="soal-txt">${s.q}</div>
-    <div class="opsi-list">${s.o.map(o=>`<label class="opsi" onclick="pickOpsi(this,'${type}-${si}')"><input type="radio" name="${type}-${si}" value="${o[0]}"><div class="opsi-radio"></div>${o}</label>`).join('')}</div>
-  </div>`).join('');
-
-  document.getElementById('s-tpa').classList.add('active');
-  document.querySelectorAll('.fsec:not(#s-tpa)').forEach(s=>s.classList.remove('active'));
-
-  timerSec=600;timerMax=600;
-  clearInterval(timerInt);
-  updFloatTimer();
-  document.getElementById('floatTimer').classList.add('show');
-  timerInt=setInterval(()=>{timerSec--;updFloatTimer();if(timerSec<=0){clearInterval(timerInt);selesaiTPA();}},1000);
-}
-
-function updFloatTimer(){
-  const m=Math.floor(timerSec/60),s=timerSec%60;
-  const val=document.getElementById('ftVal');
-  const fill=document.getElementById('ftFill');
-  const pct=(timerSec/timerMax)*100;
-  val.textContent=`${m}:${s.toString().padStart(2,'0')}`;
-  fill.style.width=pct+'%';
-  val.className='ft-val'+(timerSec<=60?' danger':timerSec<=120?' warn':'');
-  fill.style.background=timerSec<=60?'#dc2626':timerSec<=120?'#d97706':'#C2456A';
-}
-
-function pickOpsi(el,name){
-  document.querySelectorAll(`[onclick="pickOpsi(this,'${name}')"]`).forEach(l=>l.classList.remove('picked'));
-  el.classList.add('picked');
-  el.closest('.soal').classList.add('answered');
-}
-
-function selesaiTPA(){
-  clearInterval(timerInt);
-  document.getElementById('floatTimer').classList.remove('show');
-  const sq={logika:SQ_LOG,numerik:SQ_NUM,verbal:SQ_VER}[activeTPA];
-  let benar=0;
-  sq.forEach((s,i)=>{const sel=document.querySelector(`input[name="${activeTPA}-${i}"]:checked`);if(sel&&sel.value===s.j)benar++;});
-  tpaAns[activeTPA]=(benar/sq.length)*100;
-  document.getElementById('s-tpa').classList.remove('active');
-  step++;
-  if(step>5) submitAll();
-  else showStep(step);
-}
-
-function submitAll(){
-  const nama=document.getElementById('nama').value.trim();
-  const sma=document.getElementById('sma').value;
-  const mapel={};
-  document.querySelectorAll('#mapelBox input').forEach(inp=>{mapel[inp.id.replace('v-','').replace(/_/g,' ')]=parseFloat(inp.value)||0;});
-  const akPerKat=hitungAkademik(mapel,sma);
-  const minatRaw={};
-  document.querySelectorAll('.sk-btn.on').forEach(btn=>{const k=btn.dataset.kat;if(!minatRaw[k])minatRaw[k]=[];minatRaw[k].push(parseInt(btn.dataset.val));});
-  const minatVals={};
-  Object.keys(PM).forEach(kat=>{const v=minatRaw[kat]||[];minatVals[kat]=v.length?((v.reduce((a,b)=>a+b,0)-v.length)/(v.length*3))*100:50;});
-  const hasil=hitungSemua(akPerKat,tpaAns,minatVals,sma);
-  const hist=JSON.parse(localStorage.getItem('pf_history')||'[]');
-  hist.unshift({nama,tanggal:new Date().toLocaleDateString('id'),top1:hasil[0].jurusan,pct:hasil[0].pct});
-  localStorage.setItem('pf_history',JSON.stringify(hist.slice(0,10)));
-  localStorage.setItem('pf_nama',nama);
-  localStorage.setItem('pf_hasil',JSON.stringify(hasil));
-  window.location.href='hasil.html';
-}
-
-updProg();
-</script>
 </body>
 </html>

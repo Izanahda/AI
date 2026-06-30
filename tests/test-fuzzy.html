@@ -294,7 +294,7 @@ Rule key  : (${kategori.ak}, ${kategori.tpa}, ${kategori.minat})
 Output:
   Skor       = ${skor.toFixed(2)} / 4.00
   Persentase = ${persentase}%
-  Label      = ${lbl.text}
+  Label      = ${lbl.t}
   `;
 }
 
@@ -359,7 +359,7 @@ function runSimulasi() {
 
   const hasil = hitungSemuaJurusan(nilaiMapel, sma, tpaVals, minatVals);
   const baris = hasil.map((d, i) =>
-    `${String(i+1).padStart(2)}. ${d.jurusan.padEnd(22)} Skor: ${d.skor.toFixed(2)}  (${d.persentase}%)`
+    `${String(i+1).padStart(2)}. ${d.jurusan.padEnd(22)} Skor: ${d.skor.toFixed(2)}  (${pct}%)`
   ).join("\n");
 
   document.getElementById("resultSim").innerHTML =

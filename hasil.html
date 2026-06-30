@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Hasilmu — PathFinder</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="src/css/style.css">
 <style>
 /* Hasil estetik extras */
 .konfeti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;overflow:hidden;}
@@ -93,7 +93,13 @@
   </div>
 </div>
 
-<script src="fuzzy.js"></script>
+<!--
+  URUTAN SCRIPT PENTING:
+  1. data.js   → JURUSAN, PROSPEK (dibutuhkan oleh fuzzy.js)
+  2. fuzzy.js  → labelSkor() dipakai untuk render hasil
+-->
+<script src="src/js/data.js"></script>
+<script src="src/js/fuzzy.js"></script>
 <script>
 const nama=localStorage.getItem('pf_nama')||'—';
 const hasil=JSON.parse(localStorage.getItem('pf_hasil')||'[]');
@@ -138,20 +144,29 @@ function render(){
   const best=hasil[0];
   document.getElementById('prospekJurusan').textContent=best.jurusan;
   document.getElementById('prospekGrid').innerHTML=(best.p||[]).map(p=>`<div class="ptag">${p}</div>`).join('');
-  document.getElementById('alasanList').innerHTML=(best.a||[]).map(a=>`<div class="aitem"><div class="acheck">v</div>${a}</div>`).join('');
+  document.getElementById('alasanList').innerHTML=(best.a||[]).map(a=>`<div class="aitem"><div class="acheck">✓</div>${a}</div>`).join('');
   document.getElementById('scoreBars').innerHTML=[
     {l:'Nilai Akademik',v:best.akVal},
     {l:'Kemampuan TPA',v:best.tpaVal},
     {l:'Minat',v:best.minatVal},
-  ].map(s=>`<div class="sbar"><div class="sbar-lbl"><span>${s.l}</span><span>${s.v.toFixed(1)}</span></div><div class="sbar-track"><div class="sbar-fill" style="width:${s.v}%"></div></div></div>`).join('');
+  ].map(s=>`<div class="sbar"><div class="sbar-lbl"><span>${s.l}</span><span>${Number(s.v).toFixed(1)}</span></div><div class="sbar-track"><div class="sbar-fill" data-w="${s.v}"></div></div></div>`).join('');
 
   document.getElementById('allTbl').innerHTML=hasil.map((h,i)=>{
     const lb=labelSkor(h.skor);
     return `<tr><td>${i+1}</td><td><strong>${h.jurusan}</strong></td>
       <td style="font-family:monospace;font-size:11px;color:#C2456A;">${'█'.repeat(Math.round(h.pct/10)).padEnd(10,'░')} ${h.pct}%</td>
       <td><span class="rlbl ${lb.c}">${lb.t}</span></td>
-      <td>${h.akVal.toFixed(0)}</td><td>${h.tpaVal.toFixed(0)}</td><td>${h.minatVal.toFixed(0)}</td></tr>`;
+      <td>${Number(h.akVal).toFixed(0)}</td><td>${Number(h.tpaVal).toFixed(0)}</td><td>${Number(h.minatVal).toFixed(0)}</td></tr>`;
   }).join('');
+
+  // Animasikan bar skor setelah render (mencegah jump langsung ke nilai akhir)
+  requestAnimationFrame(()=>{
+    setTimeout(()=>{
+      document.querySelectorAll('.sbar-fill').forEach(b=>{
+        b.style.width=(b.dataset.w||0)+'%';
+      });
+    },150);
+  });
 
   // Build PDF
   const best2=hasil[0];
@@ -170,11 +185,16 @@ function render(){
 
 function savePDF(){
   const el=document.getElementById('pdfDoc');
-  // Simple print-based PDF
   const w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>PathFinder — ${nama}</title>
-  <style>body{font-family:Arial,sans-serif;margin:0;padding:36px;color:#2A1F2E;}*{box-sizing:border-box;}</style>
-  </head><body>${el.innerHTML}</body></html>`);
+  // PENTING: tag penutup "</style>" dan "</head>" dipecah dengan ('<' + '/style>')
+  // agar parser HTML tidak salah mengira ini menutup <script> utama saat halaman dimuat.
+  // Jika ditulis utuh di dalam template literal, browser akan menutup script
+  // lebih awal dan sisa kode (w.document.close, setTimeout) bocor jadi teks di halaman.
+  const docHtml =
+    '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>PathFinder — '+nama+'</title>' +
+    '<style>body{font-family:Arial,sans-serif;margin:0;padding:36px;color:#2A1F2E;}*{box-sizing:border-box;}' + '<' + '/style>' +
+    '<' + '/head><body>' + el.innerHTML + '<' + '/body><' + '/html>';
+  w.document.write(docHtml);
   w.document.close();
   setTimeout(()=>{w.print();},500);
 }

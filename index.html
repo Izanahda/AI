@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>PathFinder — Temukan Jalanmu</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="src/css/style.css">
 </head>
 <body>
 
@@ -12,7 +12,7 @@
 <aside class="sidebar" id="sidebar">
   <div class="sb-head">
     <span class="sb-logo">PathFinder</span>
-    <button class="sb-close" onclick="closeSb()">X</button>
+    <button class="sb-close" onclick="closeSb()">✕</button>
   </div>
   <div class="sb-body">
     <div class="sb-section">
@@ -31,9 +31,12 @@
   <div class="sb-foot">PathFinder v2.0 · 2026</div>
 </aside>
 
+<!-- Modal umum -->
 <div class="modal-ov" id="modalOv" onclick="if(event.target===this)closeModal()">
   <div class="modal-box"><div id="modalContent"></div></div>
 </div>
+
+<!-- Modal bidang -->
 <div class="modal-ov" id="modalBidangOv" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal-box" id="modalBidangBox"></div>
 </div>
@@ -72,7 +75,7 @@
   <div class="cat-row-top">
     <div class="cat-item" onclick="showBidang('teknologi')">
       <div class="cat-img-wrap">
-        <img src="images/Teknologi.png" alt="Teknologi" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
+        <img src="src/images/Teknologi.png" alt="Teknologi" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
         <div class="cat-emoji-box" style="background:#FFE8F0;display:none;">💻</div>
       </div>
       <div class="cat-name">Teknologi</div>
@@ -80,7 +83,7 @@
     </div>
     <div class="cat-item" onclick="showBidang('kesehatan')">
       <div class="cat-img-wrap">
-        <img src="images/Kesehatan.png" alt="Kesehatan" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
+        <img src="src/images/Kesehatan.png" alt="Kesehatan" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
         <div class="cat-emoji-box" style="background:#FEFDD0;display:none;">🏥</div>
       </div>
       <div class="cat-name">Kesehatan</div>
@@ -88,7 +91,7 @@
     </div>
     <div class="cat-item" onclick="showBidang('bisnis')">
       <div class="cat-img-wrap">
-        <img src="images/Bisnis.png" alt="Bisnis" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
+        <img src="src/images/Bisnis.png" alt="Bisnis" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
         <div class="cat-emoji-box" style="background:#FFE8F0;display:none;">💼</div>
       </div>
       <div class="cat-name">Bisnis</div>
@@ -98,7 +101,7 @@
   <div class="cat-row-bot">
     <div class="cat-item" onclick="showBidang('komunikasi')">
       <div class="cat-img-wrap">
-        <img src="images/Komunikasi.png" alt="Komunikasi" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
+        <img src="src/images/Komunikasi.png" alt="Komunikasi" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
         <div class="cat-emoji-box" style="background:#FEFDD0;display:none;">📢</div>
       </div>
       <div class="cat-name">Komunikasi</div>
@@ -106,7 +109,7 @@
     </div>
     <div class="cat-item" onclick="showBidang('sosial')">
       <div class="cat-img-wrap">
-        <img src="images/Sosial.png" alt="Sosial" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
+        <img src="src/images/Sosial.png" alt="Sosial" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
         <div class="cat-emoji-box" style="background:#FFE8F0;display:none;">🤝</div>
       </div>
       <div class="cat-name">Sosial</div>
@@ -127,55 +130,79 @@
   </div>
 </footer>
 
+<!-- index.html hanya punya script inline UI (sidebar, modal, bidang)
+     Tidak butuh data.js / fuzzy.js karena tidak ada kalkulasi di sini -->
 <script>
-function openSb(){document.getElementById('sidebar').classList.add('open');document.getElementById('sbOv').classList.add('show');}
-function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOv').classList.remove('show');}
-function closeModal(){document.getElementById('modalOv').classList.remove('show');}
+function openSb()  { document.getElementById('sidebar').classList.add('open'); document.getElementById('sbOv').classList.add('show'); }
+function closeSb() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sbOv').classList.remove('show'); }
+function closeModal() { document.getElementById('modalOv').classList.remove('show'); }
 
-function showInfo(title,sub,body){
-  document.getElementById('modalContent').innerHTML=`<button class="modal-close" onclick="closeModal()">X</button><div class="m-title">${title}</div><div class="m-sub">${sub}</div><div class="m-body">${body}</div>`;
+function showInfo(title, sub, body) {
+  document.getElementById('modalContent').innerHTML =
+    `<button class="modal-close" onclick="closeModal()">✕</button>
+     <div class="m-title">${title}</div>
+     <div class="m-sub">${sub}</div>
+     <div class="m-body">${body}</div>`;
   document.getElementById('modalOv').classList.add('show');
   closeSb();
 }
 
-function showAbout(){showInfo('PathFinder','Tentang Sistem','PathFinder adalah sistem rekomendasi jurusan kuliah berbasis <strong>Fuzzy Mamdani</strong>. Sistem ini menganalisis tiga faktor: nilai akademik (dibedakan MIPA/IPS), kemampuan kognitif melalui tes TPA, dan minat siswa di 5 bidang. Hasilnya berupa 3 rekomendasi jurusan dengan persentase kecocokan, prospek karier, dan alasan rekomendasi yang bisa diekspor sebagai PDF.');}
-function showTutorial(){showInfo('Tutorial','Cara Menggunakan','<b>1. Data Diri</b> — Nama & jurusan SMA<br><b>2. Nilai Akademik</b> — Nilai rapor 0–100<br><b>3. Kuisioner Minat</b> — 25 pernyataan, semua wajib dijawab<br><b>4. TPA Logika</b> — 10 soal, 10 menit<br><b>5. TPA Numerik</b> — 10 soal, 10 menit<br><b>6. TPA Verbal</b> — 10 soal, 10 menit<br><b>7. Hasil</b> — Lihat rekomendasi & simpan PDF');}
-function showMetode(){showInfo('Fuzzy Mamdani','Metode Inferensi','Fuzzy Mamdani mengubah nilai input ke derajat keanggotaan <b>Rendah/Sedang/Tinggi</b>, lalu menerapkan aturan IF-THEN untuk menghasilkan skor kecocokan 0–4. Skor ini dikonversi ke persentase dan diurutkan untuk mendapatkan top 3 rekomendasi.');}
+function showAbout() {
+  showInfo('PathFinder','Tentang Sistem',
+    'PathFinder adalah sistem rekomendasi jurusan kuliah berbasis <strong>Fuzzy Mamdani</strong>. Sistem ini menganalisis tiga faktor: nilai akademik (dibedakan MIPA/IPS), kemampuan kognitif melalui tes TPA, dan minat siswa di 5 bidang. Hasilnya berupa 3 rekomendasi jurusan dengan persentase kecocokan, prospek karier, dan alasan rekomendasi yang bisa diekspor sebagai PDF.');
+}
+function showTutorial() {
+  showInfo('Tutorial','Cara Menggunakan',
+    '<b>1. Data Diri</b> — Nama & jurusan SMA<br><b>2. Nilai Akademik</b> — Nilai rapor 0–100<br><b>3. Kuisioner Minat</b> — 25 pernyataan, semua wajib dijawab<br><b>4. TPA Logika</b> — 10 soal, 10 menit<br><b>5. TPA Numerik</b> — 10 soal, 10 menit<br><b>6. TPA Verbal</b> — 10 soal, 10 menit<br><b>7. Hasil</b> — Lihat rekomendasi & simpan PDF');
+}
+function showMetode() {
+  showInfo('Fuzzy Mamdani','Metode Inferensi',
+    'Fuzzy Mamdani mengubah nilai input ke derajat keanggotaan <b>Rendah/Sedang/Tinggi</b>, lalu menerapkan aturan IF-THEN untuk menghasilkan skor kecocokan 0–4. Skor ini dikonversi ke persentase dan diurutkan untuk mendapatkan top 3 rekomendasi.');
+}
 
-function showRiwayat(){
-  const h=JSON.parse(localStorage.getItem('pf_history')||'[]');
-  const body=h.length?h.map(x=>`<div style="padding:8px 0;border-bottom:1px solid #F0E0EA;font-size:13px;"><strong>${x.nama}</strong> · ${x.tanggal}<br><span style="color:#C2456A;font-weight:700;">${x.top1}</span> (${x.pct}%)</div>`).join('')+'<a href="hasil.html" style="display:block;text-align:center;margin-top:14px;padding:10px;background:#C2456A;color:#fff;border-radius:12px;text-decoration:none;font-weight:700;">Lihat Hasil Terakhir</a>':'<p style="text-align:center;color:#9A8AA0;padding:20px 0;">Belum ada riwayat tes.</p>';
-  document.getElementById('modalContent').innerHTML=`<button class="modal-close" onclick="closeModal()">X</button><div class="m-title">Riwayat Tes</div><div class="m-sub">Hasil Sebelumnya</div><div class="m-body">${body}</div>`;
+function showRiwayat() {
+  const h = JSON.parse(localStorage.getItem('pf_history') || '[]');
+  const body = h.length
+    ? h.map(x => `<div style="padding:8px 0;border-bottom:1px solid #F0E0EA;font-size:13px;"><strong>${x.nama}</strong> · ${x.tanggal}<br><span style="color:#C2456A;font-weight:700;">${x.top1}</span> (${x.pct}%)</div>`).join('') +
+      '<a href="hasil.html" style="display:block;text-align:center;margin-top:14px;padding:10px;background:#C2456A;color:#fff;border-radius:12px;text-decoration:none;font-weight:700;">Lihat Hasil Terakhir</a>'
+    : '<p style="text-align:center;color:#9A8AA0;padding:20px 0;">Belum ada riwayat tes.</p>';
+  document.getElementById('modalContent').innerHTML =
+    `<button class="modal-close" onclick="closeModal()">✕</button>
+     <div class="m-title">Riwayat Tes</div>
+     <div class="m-sub">Hasil Sebelumnya</div>
+     <div class="m-body">${body}</div>`;
   document.getElementById('modalOv').classList.add('show');
   closeSb();
 }
 
-const BD={
-  teknologi:{icon:'💻',name:'Teknologi',prodi:['Informatika','Sistem Informasi','Teknik Komputer'],belajar:['Pemrograman & Algoritma','Basis Data','Kecerdasan Buatan','Rekayasa Perangkat Lunak','Jaringan Komputer'],cocok:['Suka logika & problem solving','Tertarik teknologi & gadget','Suka matematika & analisis','Kreatif membangun solusi digital']},
-  kesehatan:{icon:'🏥',name:'Kesehatan',prodi:['Kedokteran','Keperawatan','Gizi Klinik'],belajar:['Anatomi & Fisiologi','Farmakologi','Ilmu Penyakit','Keperawatan Klinik','Gizi & Dietika'],cocok:['Punya empati tinggi','Suka biologi & kimia','Ingin membantu orang','Tenang menghadapi tekanan']},
-  bisnis:{icon:'💼',name:'Bisnis',prodi:['Akuntansi','Manajemen','Bisnis Digital'],belajar:['Akuntansi Keuangan','Manajemen Strategi','Pemasaran','Kewirausahaan','Ekonomi'],cocok:['Suka analisis angka','Tertarik dunia bisnis','Pandai bernegosiasi','Berorientasi hasil']},
-  komunikasi:{icon:'📢',name:'Komunikasi',prodi:['Ilmu Komunikasi','Psikologi','Hubungan Internasional'],belajar:['Teori Komunikasi','Jurnalistik','Public Relations','Psikologi Sosial','Media Digital'],cocok:['Mudah bergaul','Suka menulis & presentasi','Tertarik media & konten','Peka dinamika sosial']},
-  sosial:{icon:'🤝',name:'Sosial',prodi:['Administrasi Publik','Psikologi','Sosiologi'],belajar:['Kebijakan Publik','Perilaku Organisasi','Psikologi Perkembangan','Metode Penelitian Sosial'],cocok:['Peduli isu sosial','Suka kerja tim','Ingin berkontribusi ke masyarakat','Tertarik pemerintahan & pelayanan']},
+// Data bidang untuk modal
+const BD = {
+  teknologi:  { icon:'💻', name:'Teknologi',  prodi:['Informatika','Sistem Informasi','Teknik Komputer'], belajar:['Pemrograman & Algoritma','Basis Data','Kecerdasan Buatan','Rekayasa Perangkat Lunak','Jaringan Komputer'], cocok:['Suka logika & problem solving','Tertarik teknologi & gadget','Suka matematika & analisis','Kreatif membangun solusi digital'] },
+  kesehatan:  { icon:'🏥', name:'Kesehatan',  prodi:['Kedokteran','Keperawatan','Gizi Klinik'], belajar:['Anatomi & Fisiologi','Farmakologi','Ilmu Penyakit','Keperawatan Klinik','Gizi & Dietika'], cocok:['Punya empati tinggi','Suka biologi & kimia','Ingin membantu orang','Tenang menghadapi tekanan'] },
+  bisnis:     { icon:'💼', name:'Bisnis',     prodi:['Akuntansi','Manajemen','Bisnis Digital'], belajar:['Akuntansi Keuangan','Manajemen Strategi','Pemasaran','Kewirausahaan','Ekonomi'], cocok:['Suka analisis angka','Tertarik dunia bisnis','Pandai bernegosiasi','Berorientasi hasil'] },
+  komunikasi: { icon:'📢', name:'Komunikasi', prodi:['Ilmu Komunikasi','Psikologi','Hubungan Internasional'], belajar:['Teori Komunikasi','Jurnalistik','Public Relations','Psikologi Sosial','Media Digital'], cocok:['Mudah bergaul','Suka menulis & presentasi','Tertarik media & konten','Peka dinamika sosial'] },
+  sosial:     { icon:'🤝', name:'Sosial',     prodi:['Administrasi Publik','Psikologi','Sosiologi'], belajar:['Kebijakan Publik','Perilaku Organisasi','Psikologi Perkembangan','Metode Penelitian Sosial'], cocok:['Peduli isu sosial','Suka kerja tim','Ingin berkontribusi ke masyarakat','Tertarik pemerintahan & pelayanan'] },
 };
 
-function showBidang(k){
-  const b=BD[k];
-  document.getElementById('modalBidangBox').innerHTML=`
-    <button class="modal-close" onclick="document.getElementById('modalBidangOv').classList.remove('show')">X</button>
+function showBidang(k) {
+  const b = BD[k];
+  document.getElementById('modalBidangBox').innerHTML = `
+    <button class="modal-close" onclick="document.getElementById('modalBidangOv').classList.remove('show')">✕</button>
     <div style="font-size:36px;margin:4px 0 10px;">${b.icon}</div>
     <div class="m-title">${b.name}</div>
     <div class="m-sub">Bidang Studi</div>
     <div class="m-body">
       <p style="font-size:12px;font-weight:700;color:#9A8AA0;margin-bottom:6px;">Program Studi</p>
-      <div class="m-tags">${b.prodi.map(p=>`<span class="m-tag m-tag-p">${p}</span>`).join('')}</div>
+      <div class="m-tags">${b.prodi.map(p  => `<span class="m-tag m-tag-p">${p}</span>`).join('')}</div>
       <p style="font-size:12px;font-weight:700;color:#9A8AA0;margin:12px 0 6px;">Yang akan kamu pelajari</p>
-      <div class="m-tags">${b.belajar.map(x=>`<span class="m-tag m-tag-b">${x}</span>`).join('')}</div>
+      <div class="m-tags">${b.belajar.map(x => `<span class="m-tag m-tag-b">${x}</span>`).join('')}</div>
       <p style="font-size:12px;font-weight:700;color:#9A8AA0;margin:12px 0 6px;">Cocok buat kamu yang...</p>
-      <div class="m-tags">${b.cocok.map(x=>`<span class="m-tag m-tag-g">${x}</span>`).join('')}</div>
+      <div class="m-tags">${b.cocok.map(x  => `<span class="m-tag m-tag-g">${x}</span>`).join('')}</div>
     </div>
     <button class="m-cta" onclick="window.location.href='form.html'">Ikuti Tes Sekarang</button>`;
   document.getElementById('modalBidangOv').classList.add('show');
 }
 </script>
+
 </body>
 </html>
