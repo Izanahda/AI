@@ -73,7 +73,7 @@
   <button class="btn btn-g" onclick="savePDF()">Simpan PDF</button>
 </div>
 
-</div><!-- /hasil-wrap -->
+</div>
 
 <!-- PDF dokumen (off-screen) -->
 <div id="pdfDoc">
@@ -93,11 +93,6 @@
   </div>
 </div>
 
-<!--
-  URUTAN SCRIPT PENTING:
-  1. data.js   → JURUSAN, PROSPEK (dibutuhkan oleh fuzzy.js)
-  2. fuzzy.js  → labelSkor() dipakai untuk render hasil
--->
 <script src="src/js/data.js"></script>
 <script src="src/js/fuzzy.js"></script>
 <script>
@@ -186,10 +181,6 @@ function render(){
 function savePDF(){
   const el=document.getElementById('pdfDoc');
   const w=window.open('','_blank');
-  // PENTING: tag penutup "</style>" dan "</head>" dipecah dengan ('<' + '/style>')
-  // agar parser HTML tidak salah mengira ini menutup <script> utama saat halaman dimuat.
-  // Jika ditulis utuh di dalam template literal, browser akan menutup script
-  // lebih awal dan sisa kode (w.document.close, setTimeout) bocor jadi teks di halaman.
   const docHtml =
     '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>PathFinder — '+nama+'</title>' +
     '<style>body{font-family:Arial,sans-serif;margin:0;padding:36px;color:#2A1F2E;}*{box-sizing:border-box;}' + '<' + '/style>' +

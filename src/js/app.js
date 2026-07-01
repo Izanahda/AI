@@ -12,8 +12,8 @@
 // ── State ───────────────────────────────────────────────────
 let step       = 0;
 let timerInt   = null;
-let timerSec   = 600;
-let timerMax   = 600;
+let timerSec   = 420;
+let timerMax   = 420;
 let activeTPA  = '';
 const tpaAns   = { logika: {}, numerik: {}, verbal: {} };
 
